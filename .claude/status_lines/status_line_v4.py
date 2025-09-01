@@ -6,6 +6,30 @@
 # ]
 # ///
 
+"""
+Status Line v4 - Agent Name with Current Prompt and Extras
+
+FORMAT: [Agent] | [Model] | 💬 Current prompt... | [extras:values]
+
+COMPONENTS:
+- Agent: Session agent name in bright red (e.g., FLUX, PRISM, SYNTH)
+- Model: Current AI model name in blue
+- Current Prompt: Most recent prompt (100 chars) in bright white with icon
+  - Icons: ⚡ Command, ❓ Question, 💡 Create, 🐛 Debug, ♻️ Refactor, 💬 General
+- Extras: Optional session metadata in cyan (key:value pairs)
+
+EXAMPLE: [SYNTH] | [Claude 3 Opus] | 💡 Create a REST API server... | [mode:dev env:local]
+
+COLORS:
+- Bright Red: Agent name
+- Blue: Model name
+- Bright White: Current prompt with context-aware icon
+- Cyan: Extra metadata (if present)
+- Gray: No prompts/session data messages
+
+NOTE: This is the currently active version (v4) configured in settings.json
+"""
+
 import json
 import os
 import sys

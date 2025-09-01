@@ -6,6 +6,29 @@
 # ]
 # ///
 
+"""
+Status Line v3 - Agent Name with Prompt History
+
+FORMAT: [Agent] [Model] 💬 Current prompt | Previous prompt | Older prompt
+
+COMPONENTS:
+- Agent: Session agent name in bright red (e.g., FLUX, PRISM)
+- Model: Current AI model name in blue
+- Current Prompt: Most recent prompt (75 chars) in bright white with icon
+  - Icons: ⚡ Command, ❓ Question, 💡 Create, 🐛 Debug, ♻️ Refactor, 💬 General
+- Previous Prompt: Second most recent (50 chars) in gray
+- Older Prompt: Third most recent (30 chars) in dark gray
+
+EXAMPLE: [FLUX] [Claude 3 Opus] 💡 Create a web scraper... | Fix the bug in... | Add tests...
+
+COLORS:
+- Bright Red: Agent name
+- Blue: Model name
+- Bright White: Current prompt
+- Gray: Previous prompt
+- Dark Gray: Older prompt
+"""
+
 import json
 import os
 import sys

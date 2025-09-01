@@ -6,6 +6,26 @@
 # ]
 # ///
 
+"""
+Status Line v1 - Basic Model and Directory Status
+
+FORMAT: [Model] | 📁 Directory | 🌿 Branch ±changes | vVersion
+
+COMPONENTS:
+- Model: Current AI model name in cyan
+- Directory: Current working directory basename in blue  
+- Git Branch: Current git branch with uncommitted change count in green
+- Version: Claude Code version in gray
+
+EXAMPLE: [Claude 3 Opus] | 📁 my-project | 🌿 main ±3 | v1.0.92
+
+COLORS:
+- Cyan: Model name
+- Blue: Directory
+- Green: Git info
+- Gray: Version
+"""
+
 import json
 import os
 import sys

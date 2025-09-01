@@ -3,10 +3,10 @@
 # requires-python = ">=3.11"
 # dependencies = [
 #     "python-dotenv",
+#     "pyyaml",
 # ]
 # ///
 
-import argparse
 import json
 import os
 import sys
@@ -20,11 +20,18 @@ try:
 except ImportError:
     pass  # dotenv is optional
 
+# Import configuration utilities
+from utils.hooks_config import load_hook_config, load_global_config, get_subprocess_timeout, should_log_to_file, get_log_directory
+
 
 def log_session_start(input_data):
     """Log session start event to logs directory."""
-    # Ensure logs directory exists
-    log_dir = Path("logs")
+    # Check if logging to file is enabled
+    if not should_log_to_file('session_start', True):
+        return
+    
+    # Use configured log directory
+    log_dir = get_log_directory()
     log_dir.mkdir(parents=True, exist_ok=True)
     log_file = log_dir / 'session_start.json'
     
@@ -54,7 +61,7 @@ def get_git_status():
             ['git', 'rev-parse', '--abbrev-ref', 'HEAD'],
             capture_output=True,
             text=True,
-            timeout=5
+            timeout=get_subprocess_timeout()
         )
         current_branch = branch_result.stdout.strip() if branch_result.returncode == 0 else "unknown"
         
@@ -63,7 +70,7 @@ def get_git_status():
             ['git', 'status', '--porcelain'],
             capture_output=True,
             text=True,
-            timeout=5
+            timeout=get_subprocess_timeout()
         )
         if status_result.returncode == 0:
             changes = status_result.stdout.strip().split('\n') if status_result.stdout.strip() else []
@@ -89,7 +96,7 @@ def get_recent_issues():
             ['gh', 'issue', 'list', '--limit', '5', '--state', 'open'],
             capture_output=True,
             text=True,
-            timeout=10
+            timeout=get_subprocess_timeout()
         )
         if result.returncode == 0 and result.stdout.strip():
             return result.stdout.strip()
@@ -143,13 +150,8 @@ def load_development_context(source):
 
 def main():
     try:
-        # Parse command line arguments
-        parser = argparse.ArgumentParser()
-        parser.add_argument('--load-context', action='store_true',
-                          help='Load development context at session start')
-        parser.add_argument('--announce', action='store_true',
-                          help='Announce session start via TTS')
-        args = parser.parse_args()
+        # Load configuration
+        hook_config = load_hook_config('session_start')
         
         # Read JSON input from stdin
         input_data = json.loads(sys.stdin.read())
@@ -161,8 +163,8 @@ def main():
         # Log the session start event
         log_session_start(input_data)
         
-        # Load development context if requested
-        if args.load_context:
+        # Load development context if enabled in config
+        if hook_config.get('load_context', True):
             context = load_development_context(source)
             if context:
                 # Using JSON output to add context
@@ -175,8 +177,8 @@ def main():
                 print(json.dumps(output))
                 sys.exit(0)
         
-        # Announce session start if requested
-        if args.announce:
+        # Announce session start if enabled in config
+        if hook_config.get('announce', False):
             try:
                 # Try to use TTS to announce session start
                 script_dir = Path(__file__).parent
@@ -193,7 +195,7 @@ def main():
                     subprocess.run(
                         ["uv", "run", str(tts_script), message],
                         capture_output=True,
-                        timeout=5
+                        timeout=get_subprocess_timeout()
                     )
             except Exception:
                 pass

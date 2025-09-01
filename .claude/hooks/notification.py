@@ -3,16 +3,17 @@
 # requires-python = ">=3.11"
 # dependencies = [
 #     "python-dotenv",
+#     "pyyaml",
 # ]
 # ///
 
-import argparse
 import json
 import os
 import sys
 import subprocess
 import random
 from pathlib import Path
+from utils.hooks_config import load_hook_config, load_global_config, get_subprocess_timeout, get_log_directory
 
 try:
     from dotenv import load_dotenv
@@ -71,7 +72,7 @@ def announce_notification():
             "uv", "run", tts_script, notification_message
         ], 
         capture_output=True,  # Suppress output
-        timeout=10  # 10-second timeout
+        timeout=get_subprocess_timeout()  # Use global timeout setting
         )
         
     except (subprocess.TimeoutExpired, subprocess.SubprocessError, FileNotFoundError):
@@ -84,41 +85,47 @@ def announce_notification():
 
 def main():
     try:
-        # Parse command line arguments
-        parser = argparse.ArgumentParser()
-        parser.add_argument('--notify', action='store_true', help='Enable TTS notifications')
-        args = parser.parse_args()
+        # Load configuration directly from utilities
+        hook_config = load_hook_config('notification')
+        global_config = load_global_config()
         
         # Read JSON input from stdin
         input_data = json.loads(sys.stdin.read())
         
         # Ensure log directory exists
-        import os
-        log_dir = os.path.join(os.getcwd(), 'logs')
-        os.makedirs(log_dir, exist_ok=True)
-        log_file = os.path.join(log_dir, 'notification.json')
+        log_dir = get_log_directory()
+        log_dir.mkdir(parents=True, exist_ok=True)
+        log_file = log_dir / 'notification.json'
         
-        # Read existing log data or initialize empty list
-        if os.path.exists(log_file):
-            with open(log_file, 'r') as f:
-                try:
-                    log_data = json.load(f)
-                except (json.JSONDecodeError, ValueError):
-                    log_data = []
-        else:
-            log_data = []
+        # Log to file if enabled
+        if hook_config.get('log_to_file', True):
+            # Read existing log data or initialize empty list
+            if log_file.exists():
+                with open(log_file, 'r') as f:
+                    try:
+                        log_data = json.load(f)
+                    except (json.JSONDecodeError, ValueError):
+                        log_data = []
+            else:
+                log_data = []
+            
+            # Append new data
+            log_data.append(input_data)
+            
+            # Write back to file with formatting
+            with open(log_file, 'w') as f:
+                json.dump(log_data, f, indent=2)
         
-        # Append new data
-        log_data.append(input_data)
+        # Handle notifications based on config
+        enable_tts = hook_config.get('enable_tts', False)
+        speak_all = hook_config.get('speak_all', False)
         
-        # Write back to file with formatting
-        with open(log_file, 'w') as f:
-            json.dump(log_data, f, indent=2)
-        
-        # Announce notification via TTS only if --notify flag is set
-        # Skip TTS for the generic "Claude is waiting for your input" message
-        if args.notify and input_data.get('message') != 'Claude is waiting for your input':
-            announce_notification()
+        # Announce notification via TTS if enabled
+        # Skip TTS for generic messages unless speak_all is enabled
+        if enable_tts:
+            skip_generic = not speak_all and input_data.get('message') == 'Claude is waiting for your input'
+            if not skip_generic:
+                announce_notification()
         
         sys.exit(0)
         

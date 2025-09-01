@@ -3,15 +3,13 @@
 # requires-python = ">=3.11"
 # dependencies = [
 #     "python-dotenv",
+#     "pyyaml",
 # ]
 # ///
 
-import argparse
 import json
-import os
 import sys
 from pathlib import Path
-from datetime import datetime
 
 try:
     from dotenv import load_dotenv
@@ -19,11 +17,14 @@ try:
 except ImportError:
     pass  # dotenv is optional
 
+# Import configuration utilities
+from utils.hooks_config import load_hook_config, load_global_config, get_subprocess_timeout
 
-def log_user_prompt(session_id, input_data):
+
+def log_user_prompt(session_id, input_data, global_config):
     """Log user prompt to logs directory."""
     # Ensure logs directory exists
-    log_dir = Path("logs")
+    log_dir = Path(global_config.get('log_directory', 'logs'))
     log_dir.mkdir(parents=True, exist_ok=True)
     log_file = log_dir / 'user_prompt_submit.json'
     
@@ -79,7 +80,7 @@ def manage_session_data(session_id, prompt, name_agent=False):
                 ["uv", "run", ".claude/hooks/utils/llm/ollama.py", "--agent-name"],
                 capture_output=True,
                 text=True,
-                timeout=5  # Shorter timeout for local Ollama
+                timeout=get_subprocess_timeout()  # Use configured timeout
             )
             
             if result.returncode == 0 and result.stdout.strip():
@@ -96,7 +97,7 @@ def manage_session_data(session_id, prompt, name_agent=False):
                     ["uv", "run", ".claude/hooks/utils/llm/anth.py", "--agent-name"],
                     capture_output=True,
                     text=True,
-                    timeout=10
+                    timeout=get_subprocess_timeout()  # Use configured timeout
                 )
                 
                 if result.returncode == 0 and result.stdout.strip():
@@ -139,17 +140,9 @@ def validate_prompt(prompt):
 
 def main():
     try:
-        # Parse command line arguments
-        parser = argparse.ArgumentParser()
-        parser.add_argument('--validate', action='store_true', 
-                          help='Enable prompt validation')
-        parser.add_argument('--log-only', action='store_true',
-                          help='Only log prompts, no validation or blocking')
-        parser.add_argument('--store-last-prompt', action='store_true',
-                          help='Store the last prompt for status line display')
-        parser.add_argument('--name-agent', action='store_true',
-                          help='Generate an agent name for the session')
-        args = parser.parse_args()
+        # Load configuration using utility functions
+        hook_config = load_hook_config('user_prompt_submit')
+        global_config = load_global_config()
         
         # Read JSON input from stdin
         input_data = json.loads(sys.stdin.read())
@@ -158,15 +151,24 @@ def main():
         session_id = input_data.get('session_id', 'unknown')
         prompt = input_data.get('prompt', '')
         
-        # Log the user prompt
-        log_user_prompt(session_id, input_data)
+        # Log the user prompt if enabled
+        if hook_config.get('log_prompts', True):
+            log_user_prompt(session_id, input_data, global_config)
         
-        # Manage session data with JSON structure
-        if args.store_last_prompt or args.name_agent:
-            manage_session_data(session_id, prompt, name_agent=args.name_agent)
+        # Manage session data if enabled
+        if hook_config.get('manage_sessions', True):
+            store_prompt = hook_config.get('store_last_prompt', True)
+            generate_name = hook_config.get('generate_agent_name', True)
+            if store_prompt or generate_name:
+                manage_session_data(session_id, prompt, name_agent=generate_name)
+            
+            # TODO: Implement session timeout functionality
+            # session_timeout_hours = hook_config.get('session_timeout_hours', 0)
+            # if session_timeout_hours > 0:
+            #     cleanup_expired_sessions(session_timeout_hours)
         
-        # Validate prompt if requested and not in log-only mode
-        if args.validate and not args.log_only:
+        # Validate prompt if enabled
+        if hook_config.get('enable_validation', False):
             is_valid, reason = validate_prompt(prompt)
             if not is_valid:
                 # Exit code 2 blocks the prompt with error message

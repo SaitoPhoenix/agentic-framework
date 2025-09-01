@@ -1,0 +1,130 @@
+# Claude Code Hooks Configuration
+# This file centralizes all hook configurations
+# Update these settings to customize hook behavior
+
+# Stop Hook - Runs when Claude Code finishes responding
+stop:
+  # Enable/disable specific features
+  enable_tts: false              # Text-to-speech completion announcements
+  enable_slack: true            # Slack notifications for completed tasks
+  enable_chat_log: true         # Copy transcript to logs/chat.json
+  
+  # Additional settings
+  log_to_file: true             # Log events to logs/stop.json
+  debug_mode: false             # Enable debug logging to logs/slack_debug.log
+
+# Notification Hook - Runs when Claude sends notifications
+notification:
+  enable_tts: false              # Speak notifications aloud
+  # enable_desktop: false       # Desktop notifications (requires notify-send) - NOT IMPLEMENTED - COMMENTED OUT
+  # enable_slack: false         # Send notifications to Slack - NOT IMPLEMENTED - COMMENTED OUT
+  
+  # TO IMPLEMENT MISSING FEATURES:
+  # - Desktop: Add subprocess call to 'notify-send' command in announce_notification()
+  # - Slack: Add requests.post() to SLACK_NOTIFICATION_URL in announce_notification()
+  
+  # Notification settings
+  speak_all: false              # Speak all notifications (vs only important ones)
+  log_to_file: true             # Log events to logs/notification.json
+
+# SubagentStop Hook - Runs when subagent tasks complete
+subagent_stop:
+  enable_tts: false              # Announce subagent completion
+  # enable_slack: false         # Send subagent results to Slack - NOT IMPLEMENTED
+  enable_chat_log: false        # Copy transcript to logs/agent_chats/{agent}_chat.json
+  
+  # Subagent settings
+  # summarize_results: true     # Summarize long subagent outputs - NOT IMPLEMENTED
+  log_to_file: true             # Log events to logs/subagent_stop.json
+  
+  # TO IMPLEMENT MISSING FEATURES:
+  # - enable_slack: Add Slack notification functionality to announce_subagent_completion()
+  # - summarize_results: Add logic to truncate/summarize long transcript outputs
+
+# UserPromptSubmit Hook - Runs when user submits a prompt
+user_prompt_submit:
+  enable_validation: false      # Enable prompt validation/blocking
+  log_prompts: true            # Log prompts to logs/user_prompt_submit.json
+  store_last_prompt: true      # Store last prompt for status line
+  generate_agent_name: true    # Generate unique agent name for session
+  
+  # Session management
+  manage_sessions: true        # Maintain session data in .claude/data/sessions/
+  # session_timeout_hours: 24    # Hours before session expires (0 = never) - NOT YET IMPLEMENTED
+
+# PreToolUse Hook - Runs before tool calls
+pre_tool_use:
+  log_to_file: true            # Log tool use to logs/pre_tool_use.json
+  
+  # Tool restrictions
+  block_dangerous_commands: true   # Block rm -rf, etc. (always blocks .env access)
+  
+  # FUTURE FEATURES - NOT YET IMPLEMENTED:
+  # validate_commands: false       # Validate commands before execution - NOT IMPLEMENTED
+  # require_confirmation: []       # Tools requiring user confirmation - NOT IMPLEMENTED
+  #
+  # TO IMPLEMENT MISSING FEATURES:
+  # - validate_commands: Add extensible command validation framework
+  # - require_confirmation: Add interactive confirmation prompts for specified tools
+  # - custom validation rules: Add configurable regex patterns for command blocking
+
+# PostToolUse Hook - Runs after tool calls complete  
+post_tool_use:
+  log_to_file: true            # Log tool results to logs/post_tool_use.json
+  
+  # FUTURE FEATURES - NOT YET IMPLEMENTED:
+  # auto_format: false           # Auto-format code after edits - NOT IMPLEMENTED
+  # format_markdown: false       # Auto-format markdown files - NOT IMPLEMENTED  
+  # format_python: false         # Auto-format Python files with black - NOT IMPLEMENTED
+  # format_javascript: false     # Auto-format JS/TS with prettier - NOT IMPLEMENTED
+  #
+  # TO IMPLEMENT AUTO-FORMATTING:
+  # 1. Parse input_data to extract file paths from tool results
+  # 2. Check file extensions and apply appropriate formatters:
+  #    - Python: subprocess.run(['black', file_path], timeout=get_subprocess_timeout())
+  #    - JS/TS: subprocess.run(['prettier', '--write', file_path])  
+  #    - Markdown: subprocess.run(['prettier', '--write', file_path])
+  # 3. Add error handling and validation for formatter availability
+
+# PreCompact Hook - Runs before context compaction
+pre_compact:
+  log_to_file: true            # Log compaction events
+  save_context: false          # Save context before compaction
+  create_backup: true          # Create backup of transcript before compaction
+  verbose_output: false        # Print verbose output during compaction
+  
+  # Compaction settings
+  context_save_dir: "logs/context/"  # Where to save context snapshots
+  backup_dir: "transcript_backups/"  # Subdirectory within logs for transcript backups
+
+# SessionStart Hook - Runs when session starts/resumes
+session_start:
+  log_to_file: true            # Log session starts
+  load_context: false           # Load development context at session start
+  announce: false              # Announce session start via TTS
+  
+  # Advanced features - NOT IMPLEMENTED
+  # restore_state: true        # Restore previous session state - NOT IMPLEMENTED
+  # show_welcome: false        # Show welcome message - NOT IMPLEMENTED  
+  # announce_agent: true       # Announce agent name via TTS - NOT IMPLEMENTED
+  #
+  # TO IMPLEMENT MISSING FEATURES:
+  # - restore_state: Load session data from .claude/data/sessions/{session_id}.json
+  # - show_welcome: Add welcome message to hookSpecificOutput
+  # - announce_agent: Extract agent name from session data and use TTS
+
+# Global Settings - Apply to all hooks
+global:
+  # API Keys and URLs are loaded from .env file
+  # SLACK_NOTIFICATION_URL, TABBYAPI_APIKEY, etc.
+  
+  # Logging
+  log_directory: "logs"        # Directory for all log files
+  # max_log_size_mb: 100       # Max size before log rotation - NOT IMPLEMENTED
+  # keep_log_days: 30          # Days to keep old logs - NOT IMPLEMENTED
+  
+  # Performance
+  subprocess_timeout: 10       # Timeout for subprocess calls (seconds)
+  
+  # Debug
+  verbose_errors: false        # Show detailed error messages

@@ -114,3 +114,6 @@ extras/
 
 # Claude Code data
 .claude/data/
+
+# Slack configurations
+slack-bots.md

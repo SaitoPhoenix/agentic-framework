@@ -6,12 +6,12 @@
 # ]
 # ///
 
-import argparse
 import json
 import os
 import sys
 from pathlib import Path
 from datetime import datetime
+from utils.hooks_config import load_hook_config, get_log_directory, should_log_to_file
 
 try:
     from dotenv import load_dotenv
@@ -22,8 +22,12 @@ except ImportError:
 
 def log_pre_compact(input_data):
     """Log pre-compact event to logs directory."""
-    # Ensure logs directory exists
-    log_dir = Path("logs")
+    # Only log if enabled in config
+    if not should_log_to_file('pre_compact'):
+        return
+    
+    # Use configured log directory
+    log_dir = get_log_directory()
     log_dir.mkdir(parents=True, exist_ok=True)
     log_file = log_dir / 'pre_compact.json'
     
@@ -45,14 +49,16 @@ def log_pre_compact(input_data):
         json.dump(log_data, f, indent=2)
 
 
-def backup_transcript(transcript_path, trigger):
+def backup_transcript(transcript_path, trigger, hook_config):
     """Create a backup of the transcript before compaction."""
     try:
-        if not os.path.exists(transcript_path):
+        if not Path(transcript_path).exists():
             return
         
-        # Create backup directory
-        backup_dir = Path("logs") / "transcript_backups"
+        # Get backup directory from config
+        log_dir = get_log_directory()
+        backup_subdir = hook_config.get('backup_dir', 'transcript_backups/')
+        backup_dir = log_dir / backup_subdir.rstrip('/')
         backup_dir.mkdir(parents=True, exist_ok=True)
         
         # Generate backup filename with timestamp and trigger type
@@ -72,13 +78,8 @@ def backup_transcript(transcript_path, trigger):
 
 def main():
     try:
-        # Parse command line arguments
-        parser = argparse.ArgumentParser()
-        parser.add_argument('--backup', action='store_true',
-                          help='Create backup of transcript before compaction')
-        parser.add_argument('--verbose', action='store_true',
-                          help='Print verbose output')
-        args = parser.parse_args()
+        # Load hook configuration
+        hook_config = load_hook_config('pre_compact')
         
         # Read JSON input from stdin
         input_data = json.loads(sys.stdin.read())
@@ -92,13 +93,13 @@ def main():
         # Log the pre-compact event
         log_pre_compact(input_data)
         
-        # Create backup if requested
+        # Create backup if enabled in config
         backup_path = None
-        if args.backup and transcript_path:
-            backup_path = backup_transcript(transcript_path, trigger)
+        if hook_config.get('create_backup', True) and transcript_path:
+            backup_path = backup_transcript(transcript_path, trigger, hook_config)
         
-        # Provide feedback based on trigger type
-        if args.verbose:
+        # Provide feedback based on config
+        if hook_config.get('verbose_output', False):
             if trigger == "manual":
                 message = f"Preparing for manual compaction (session: {session_id[:8]}...)"
                 if custom_instructions:

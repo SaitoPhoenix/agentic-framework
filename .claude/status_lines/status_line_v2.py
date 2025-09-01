@@ -6,6 +6,34 @@
 # ]
 # ///
 
+"""
+Status Line v2 - Last User Prompt Display
+
+FORMAT: [Model] 💬 Last user prompt text...
+
+COMPONENTS:
+- Model: Current AI model name in cyan
+- Icon: Context-aware emoji based on prompt type
+  - ⚡ Command (starts with /)
+  - ❓ Question (contains ?)
+  - 💡 Creation (create, write, add, implement, build)
+  - 🐛 Debug (fix, debug, error, issue)
+  - ♻️ Refactor (refactor, improve, optimize)
+  - 💬 General conversation
+- Prompt: Last user prompt with context-aware coloring
+
+EXAMPLE: [Claude 3 Opus] 💡 Create a Python web scraper
+
+COLORS:
+- Cyan: Model name
+- Yellow: Commands
+- Blue: Questions
+- Green: Creation tasks
+- Red: Debug/fix tasks
+- Magenta: Refactor tasks
+- White: General prompts
+"""
+
 import json
 import os
 import sys

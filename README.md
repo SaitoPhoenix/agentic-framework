@@ -2,7 +2,6 @@
 
 [Claude Code Hooks](https://docs.anthropic.com/en/docs/claude-code/hooks) - Quickly master how to use Claude Code hooks to add deterministic (or non-deterministic) control over Claude Code's behavior. Plus learn about [Claude Code Sub-Agents](#claude-code-sub-agents) and the powerful [Meta-Agent](#the-meta-agent).
 
-<img src="images/hooked.png" alt="Claude Code Hooks" style="max-width: 800px; width: 100%;" />
 
 ## Prerequisites
 
@@ -114,12 +113,15 @@ This approach ensures your hooks remain functional across different environments
   - `session_start.py` - Development context loading and session logging
   - `utils/` - Intelligent TTS and LLM utility scripts
     - `tts/` - Text-to-speech providers (ElevenLabs, OpenAI, pyttsx3)
-    - `llm/` - Language model integrations (OpenAI, Anthropic, Ollama)
+    - `llm/` - Language model integrations (OpenAI, Anthropic, Ollama, TabbyAPI)
+    - `hooks_config.py` - Hook configuration utilities
+    - `hooks_config.yaml` - Hook configuration settings
 - `.claude/status_lines/` - Real-time terminal status displays
   - `status_line.py` - Basic MVP with git info
   - `status_line_v2.py` - Smart prompts with color coding
   - `status_line_v3.py` - Agent sessions with history
   - `status_line_v4.py` - Extended metadata support
+  - `status_line.md` - Complete status line documentation
 - `.claude/output-styles/` - Response formatting configurations
   - `genui.md` - Generates beautiful HTML with embedded styling
   - `table-based.md` - Organizes information in markdown tables
@@ -129,17 +131,17 @@ This approach ensures your hooks remain functional across different environments
   - `html-structured.md` - Semantic HTML5
   - `markdown-focused.md` - Rich markdown features
   - `tts-summary.md` - Audio feedback via TTS
+  - `summary.md` - Concise action summaries (500 chars max)
 - `.claude/commands/` - Custom slash commands
   - `prime.md` - Project analysis and understanding
-  - `crypto_research.md` - Cryptocurrency research workflows
   - `cook.md` - Advanced task execution
   - `update_status_line.md` - Dynamic status updates
+  - `list_available_mcp.md` - List MCP servers with descriptions
 - `.claude/agents/` - Sub-agent configurations
-  - `crypto/` - Cryptocurrency analysis agents
+  - `feature_analyzer.md` - Feature and code analysis specialist
   - `hello-world-agent.md` - Simple greeting example
   - `llm-ai-agents-and-eng-research.md` - AI research specialist
   - `meta-agent.md` - Agent that creates other agents
-  - `work-completion-summary.md` - Audio summary generator
 - `logs/` - JSON logs of all hook executions
   - `user_prompt_submit.json` - User prompt submissions with validation
   - `pre_tool_use.json` - Tool use events with security blocking
@@ -455,7 +457,6 @@ Options:
 >
 > See the [Claude Code Sub-Agents documentation](https://docs.anthropic.com/en/docs/claude-code/sub-agents) for more details.
 
-<img src="images/subagents.png" alt="Claude Code Sub-Agents" style="max-width: 800px; width: 100%;" />
 
 Claude Code supports specialized sub-agents that handle specific tasks with custom system prompts, tools, and separate context windows. Sub-agents are AI assistants that your primary Claude Code agent can delegate tasks to.
 
@@ -468,7 +469,6 @@ Claude Code supports specialized sub-agents that handle specific tasks with cust
 You (User) → Primary Agent → Sub-Agent → Primary Agent → You (User)
 ```
 
-<img src="images/SubAgentFlow.gif" alt="Sub-Agent Information Flow" style="max-width: 800px; width: 100%;" />
 
 1. **You** make a request to Claude Code (primary agent)
 2. **Primary Agent** analyzes your request and delegates to appropriate sub-agent
@@ -489,18 +489,10 @@ This repository demonstrates various agent configurations:
 **Project Agents** (`.claude/agents/`):
 ```
 .claude/agents/
-├── crypto/                    # Cryptocurrency analysis agents
-│   ├── crypto-coin-analyzer-haiku.md
-│   ├── crypto-coin-analyzer-opus.md
-│   ├── crypto-coin-analyzer-sonnet.md
-│   ├── crypto-investment-plays-*.md
-│   ├── crypto-market-agent-*.md
-│   ├── crypto-movers-haiku.md
-│   └── macro-crypto-correlation-scanner-*.md
+├── feature_analyzer.md        # Feature and code analysis specialist
 ├── hello-world-agent.md       # Simple greeting agent
 ├── llm-ai-agents-and-eng-research.md  # AI research specialist
-├── meta-agent.md              # Agent that creates agents
-└── work-completion-summary.md # Audio summary generator
+└── meta-agent.md              # Agent that creates agents
 ```
 
 **Storage Hierarchy**:
@@ -554,10 +546,9 @@ Sub-agents enable:
 
 Claude Code can intelligently chain multiple sub-agents together for complex tasks:
 
-<img src="images/SubAgentChain.gif" alt="Sub-Agent Chaining" style="max-width: 800px; width: 100%;" />
 
 For example:
-- "First analyze the market with crypto-market-agent, then use crypto-investment-plays to find opportunities"
+- "Use the feature_analyzer agent to analyze the implementation, then fix the issues"
 - "Use the debugger agent to fix errors, then have the code-reviewer check the changes"
 - "Generate a new agent with meta-agent, then test it on a specific task"
 
@@ -588,13 +579,13 @@ The meta-agent follows the principle: "Figure out how to scale it up. Build the 
 
 > **Watch the walkthrough:** See these features in action at [https://youtu.be/mJhsWrEv-Go](https://youtu.be/mJhsWrEv-Go)
 
-<img src="images/genui.png" alt="GenUI Output Style" style="max-width: 800px; width: 100%;" />
 
 This project includes a comprehensive collection of custom output styles (`.claude/output-styles/`) that transform how Claude Code communicates responses. See the [official documentation](https://docs.anthropic.com/en/docs/claude-code/output-styles) for complete details on how output styles work.
 
 | Style                | Description                                        | Best For                                                |
 | -------------------- | -------------------------------------------------- | ------------------------------------------------------- |
-| **genui** ⭐          | **Generates beautiful HTML with embedded styling** | **Interactive visual outputs, instant browser preview** |
+| **genui**           | **Generates beautiful HTML with embedded styling** | **Interactive visual outputs, instant browser preview** |
+| **summary**          | Concise action summaries (500 chars max)           | Quick status updates, action reporting                  |
 | **table-based**      | Organizes all information in markdown tables       | Comparisons, structured data, status reports            |
 | **yaml-structured**  | Formats responses as YAML configuration            | Settings, hierarchical data, API responses              |
 | **bullet-points**    | Clean nested lists with dashes and numbers         | Action items, documentation, task tracking              |
