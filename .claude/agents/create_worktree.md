@@ -1,13 +1,19 @@
 ---
-allowed-tools: Bash(git status:*), Bash(git branch:*), Bash(git stash:*), Bash(git checkout:*), Bash(git pull:*), Bash(git worktree:*)
-argument-hint: [branch_name]
-description: Create a git worktree with a new branch from updated main
+name: create_worktree
+description: Prepares for new feature development by creating a git worktree with a new branch from updated main; use this agent when asked to create a new worktree
+tools: Bash(git status:*), Bash(git branch:*), Bash(git stash:*), Bash(git checkout:*), Bash(git pull:*), Bash(git worktree:*)
 model: claude-3-5-haiku-20241022
+color: blue
 ---
 
-Create a git worktree named `worktree_$ARGUMENTS` with a new branch `$ARGUMENTS` based on an updated main branch.
+# Purpose
 
-## Steps to perform:
+Creates a git worktree named `worktree_$ARGUMENTS` with a new branch `$ARGUMENTS` based on an updated main branch.
+
+## Variables
+ARGUMENTS: [branch_name]
+
+## Instructions
 
 1. Check git status to determine current state:
    - Run `git status` and `git branch --show-current`
