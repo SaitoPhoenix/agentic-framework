@@ -104,16 +104,13 @@ coverage/
 tmp/
 temp/
 
-
-.mcp.json
-
-output
-outputs/
-
-extras/
-
 # Claude Code data
 .claude/data/
+.claude-trace/
+.mcp.json
 
 # Slack configurations
 slack-bots.md
+
+# Worktrees
+worktree_*/
