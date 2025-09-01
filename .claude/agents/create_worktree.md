@@ -2,7 +2,7 @@
 name: create_worktree
 description: Prepares for new feature development by creating a git worktree with a new branch from updated main; use this agent when asked to create a new worktree
 tools: Bash(git status:*), Bash(git branch:*), Bash(git stash:*), Bash(git checkout:*), Bash(git pull:*), Bash(git worktree:*)
-model: claude-3-5-haiku-20241022
+model: haiku
 color: blue
 ---
 
