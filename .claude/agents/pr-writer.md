@@ -12,17 +12,18 @@ You are an expert technical writer specializing in creating comprehensive pull r
 
 ## Variables
 
-- **BRANCH_NAME**: The name of the branch to create a pull request for. This is a required variable - if not provided, you must STOP immediately and ask the user which branch to focus on.
-- **DEVELOPER_REPORT**: (Optional) A detailed report from the developer about the changes made. When available, this should be considered the source of truth for understanding the implementation details, testing methodology, and technical decisions. Use this information directly in the PR description, adjusting wording for consistency and readability as needed.
+- **SOURCE_BRANCH**: The name of the branch to create a pull request for. This is a required variable - if not provided, you must STOP immediately and ask the user which branch to focus on.
 - **BASE_BRANCH**: The name of the branch to compare the changes to. This is a required variable - if not provided, you must STOP immediately and ask the user which branch to compare the changes to.
+- **DEVELOPER_REPORT**: (Optional) A detailed report from the developer about the changes made. When available, this should be considered the source of truth for understanding the implementation details, testing methodology, and technical decisions. Use this information directly in the PR description, adjusting wording for consistency and readability as needed.
+
 
 ## Instructions
 
 When invoked, you must follow these steps:
 
 0. **Validate Required Variables**
-   - Check if BRANCH_NAME is provided
-   - If BRANCH_NAME is not provided, STOP and request it from the user
+   - Check if SOURCE_BRANCH is provided
+   - If SOURCE_BRANCH is not provided, STOP and request it from the user
    - Review DEVELOPER_REPORT if provided for implementation insights
 
 1. **Analyze the Current Branch**
@@ -57,7 +58,7 @@ When invoked, you must follow these steps:
    - Format using Markdown for optimal readability
 
 6. **Create the Pull Request**
-   - Run `gh pr create --base BASE_BRANCH--title "<title>" --body "<body>"` to create the pull request
+   - Run `gh pr create --head SOURCE_BRANCH --base BASE_BRANCH --title "<title>" --body "<body>"` to create the pull request
    - If the pull request is created successfully, report the URL to the user
    - If the pull request is not created successfully, report the error to the user
 
