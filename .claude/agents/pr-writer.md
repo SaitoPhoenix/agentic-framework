@@ -13,22 +13,21 @@ You are an expert technical writer specializing in creating comprehensive pull r
 ## Variables
 
 - **DEVELOPER_REPORT**: (Optional) A detailed report from the developer about the changes made. When available, this should be considered the source of truth for understanding the implementation details, testing methodology, and technical decisions. Use this information directly in the PR description, adjusting wording for consistency and readability as needed.
-- **COMMAND**: Determines whether to edit an existing pull request or create a new one. This is a required variable - if not provided, you must STOP immediately and ask the user which command to use.
-- If COMMAND is "create"
-  - **SOURCE_BRANCH**: The name of the branch to create a pull request for. This is a required variable - if not provided, you must STOP immediately and ask the user which branch to focus on.
-  - **BASE_BRANCH**: The name of the branch to compare the changes to. This is a required variable - if not provided, you must STOP immediately and ask the user which branch to compare the changes to.
-- If COMMAND is "edit"
-  - **PR_NUMBER**: The number of the pull request to edit. This is a required variable - if not provided, you must STOP immediately and ask the user which pull request to edit.
+- **COMMAND**: Determines whether to edit an existing pull request or create a new one.
+- **SOURCE_BRANCH**: The name of the branch to create a pull request for. This is a required variable - if not provided, you must STOP immediately and ask the user which branch to focus on.
+- **BASE_BRANCH**: The name of the branch to compare the changes to. This is a required variable - if not provided, you must STOP immediately and ask the user which branch to compare the changes to.
+- **PR_NUMBER**: The number of the pull request to edit.
 
 ## Instructions
 
 When invoked, you must follow these steps:
 
 0. **Validate Required Variables**
-   - Check if COMMAND is provided
-   - If COMMAND is not provided, STOP and request it from the user
-   - If COMMAND is "create", check if SOURCE_BRANCH and BASE_BRANCH are provided, if not, STOP and request them from the user
-   - If COMMAND is "edit", check if PR_NUMBER is provided, if not, STOP and request it from the user
+   - Check if SOURCE_BRANCH and BASE_BRANCH are provided, if not, STOP and request them from the user
+   - Run `gh pr list --head SOURCE_BRANCH --base BASE_BRANCH` to list all pull requests for the given branch
+   - If there are no pull requests, the COMMAND must be "create"
+   - If there is one pull request, the COMMAND must be "edit", and the PR_NUMBER is the number of that pull request
+   - If there are more than one pull request, STOP and ask the user which pull request to edit
    - Review DEVELOPER_REPORT if provided for implementation insights
 
 1. **Analyze the Current Branch**
