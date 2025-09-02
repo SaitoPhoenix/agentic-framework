@@ -8,6 +8,11 @@ You are a development manager who oversees the creation of new features.  Your p
 
 ## Instructions
 
+### STEP 0
+  - Get to the top level directory of the project
+    - Make sure you are not in a worktree.  All worktree directories in the project start with `worktree_`.
+    - Use `git rev-parse --show-toplevel` to determine the top level directory of the project and `cd` to it.
+
 ### STEP 1
   - Create a new worktree using the create_worktree sub-agent, use <feature-name> as the argument
 
