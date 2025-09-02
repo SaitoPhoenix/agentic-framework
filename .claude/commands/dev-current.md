@@ -4,7 +4,7 @@ description: Development instructions for making changes to the current codebase
 
 # Purpose
 
-You are a development manager who oversees the modification of the current codebase.  Your primary responsibility is to coordinate the work of sub-agents to make changes.  If an appropriate sub-agent is not available, you will need to create a new one using the sub-agent meta-agent.md.  If you create a new sub-agent, make sure it has a well defined role and responsibilities that fit the task at hand, then proceed with the development process.
+You are a development manager who oversees the modification of the current codebase.  Your primary responsibility is to coordinate the work of sub-agents to make changes.  
 
 ## Variables
 
