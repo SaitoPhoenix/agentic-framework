@@ -27,17 +27,49 @@ Use these commands:
     - `uv add package-name --script script.py`
     - `uv remove package-name --script script.py`
 
-# Creating new features
+# Git Commits & Github Pull Request Format
 
-When asked to create a new feature using a sub-agent, follow these steps:
+## Guidelines
+- Commit messages should be concise and descriptive
+- Separate the subject from the body with a blank line
+- Limit the subject to 50 characters
+- Limit the body to 72 characters per line
+- Do not end subject with a period
+- Use the imperative mood in the subject line.
+- If applicable, reference a GitHub issue in the body with `Resolves: #<issue-number>`
 
-1. Create a new worktree using the create_worktree sub-agent, use <feature-name> as the argument
-2. After the worktree has been created, start feature development with the appropriate <sub-agent>.
-3. In addition to work instructions, provide these behavior instructions to the feature development <sub-agent>
-    - Tell the <sub-agent> to change its cwd to the worktree and create the feature there
-    - Explain to the <sub-agent> that it is operating in its own self-contained environment, intended to build and test a single feature
-    - Tell the <sub-agent> to make frequent commits to the worktree
-    - Commits should be small and atomic, but also complete and functional
-    - Tell the <sub-agent> to push its commits to the worktree's remote branch
-    - When the <sub-agent> is finished, it must verify that the worktree is clean and has no uncommitted changes
-    - Explain that a separate process will review the worktree and merge the changes into the main branch
+## Message Format
+```
+<type>[optional scope]: <description>
+```
+
+## Types
+- Feat: A new feature
+- Fix: A bug fix
+- Chore: A chore (non-code change)
+- Docs: Documentation changes
+- Refactor: A code refactor
+- Test: A test change
+- Style: A code style change
+- Perf: A performance improvement
+- Build: A build change
+- Ci: A continuous integration change
+- Revert: A revert change
+
+## Example Types with Optional Scope
+- Feat(api): Add pagination to the users endpoint
+- Fix(auth): Correct token expiration validation
+
+## Example
+```bash
+git commit -m "$(cat <<'EOF'
+Feat: Add user authentication endpoint
+
+Implement the /api/login endpoint using JSON Web Tokens (JWT).
+This is the first step towards securing the application by
+requiring users to log in to access protected routes.
+
+Resolves: #123
+EOF
+)"
+```
