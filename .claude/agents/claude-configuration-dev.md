@@ -62,7 +62,7 @@ When invoked, you must follow these steps:
 **Implementation Guidelines:**
 - For YAML configs: Use clear hierarchical structure with proper indentation
 - For Python helpers: Follow PEP 8 style guide and use type hints
-- For hooks: Ensure non-blocking execution and graceful failure handling
+- For hooks: Ensure seamless execution and graceful failure handling
 - For output styles: Maintain readability across different terminal environments
 - For status lines: Keep updates efficient and avoid excessive refreshing
 - For slash commands: Implement clear help text and argument validation
