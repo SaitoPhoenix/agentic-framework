@@ -13,16 +13,20 @@ from typing import Dict, Any, Optional, Tuple
 from utils.hooks_config import load_hook_config, get_log_directory, should_log_to_file
 
 
-def is_dangerous_rm_command(command):
+def is_dangerous_command(command):
     """
-    Comprehensive detection of dangerous rm commands.
-    Matches various forms of rm -rf and similar destructive patterns.
+    Comprehensive detection of dangerous commands including rm, sudo, etc.
+    Matches various forms of potentially destructive patterns.
     """
     # Normalize command by removing extra spaces and converting to lowercase
     normalized = " ".join(command.lower().split())
 
+    # Check for sudo commands first
+    if re.search(r"\bsudo\b", normalized) or re.search(r"\bsu\b", normalized):
+        return True, "sudo/su commands"
+
     # Pattern 1: Standard rm -rf variations
-    patterns = [
+    rm_patterns = [
         r"\brm\s+.*-[a-z]*r[a-z]*f",  # rm -rf, rm -fr, rm -Rf, etc.
         r"\brm\s+.*-[a-z]*f[a-z]*r",  # rm -fr variations
         r"\brm\s+--recursive\s+--force",  # rm --recursive --force
@@ -31,10 +35,10 @@ def is_dangerous_rm_command(command):
         r"\brm\s+-f\s+.*-r",  # rm -f ... -r
     ]
 
-    # Check for dangerous patterns
-    for pattern in patterns:
+    # Check for dangerous rm patterns
+    for pattern in rm_patterns:
         if re.search(pattern, normalized):
-            return True
+            return True, "dangerous rm command"
 
     # Pattern 2: Check for rm with recursive flag targeting dangerous paths
     dangerous_paths = [
@@ -52,9 +56,9 @@ def is_dangerous_rm_command(command):
     if re.search(r"\brm\s+.*-[a-z]*r", normalized):  # If rm has recursive flag
         for path in dangerous_paths:
             if re.search(path, normalized):
-                return True
+                return True, "dangerous rm command"
 
-    return False
+    return False, ""
 
 
 def is_env_file_access(tool_name, tool_input):
@@ -163,6 +167,12 @@ def check_tool_permission(
 ) -> Tuple[str, str]:
     """
     Check permission for a tool based on worktree and global configuration.
+    
+    Permission hierarchy (highest to lowest precedence):
+    1. Worktree-specific permissions (allow/deny/ask)
+    2. Global always_allow
+    3. Global always_deny
+    4. Default permission
 
     Args:
         tool_identifier: Formatted tool identifier
@@ -172,19 +182,7 @@ def check_tool_permission(
     Returns:
         Tuple of (permission_decision, reason)
     """
-    # Check global always_deny first
-    always_deny = global_config.get("always_deny", [])
-    for denied_pattern in always_deny:
-        if matches_pattern(tool_identifier, denied_pattern):
-            return "deny", f"Tool '{tool_identifier}' is globally denied for security"
-
-    # Check global always_allow
-    always_allow = global_config.get("always_allow", [])
-    for allowed_pattern in always_allow:
-        if matches_pattern(tool_identifier, allowed_pattern):
-            return "allow", f"Tool '{tool_identifier}' is globally allowed"
-
-    # Check worktree-specific permissions
+    # Check worktree-specific permissions FIRST (highest priority)
     worktree_permissions = worktree_config.get("permissions", {})
 
     # Direct match first
@@ -200,6 +198,18 @@ def check_tool_permission(
                 perm,
                 f"Worktree pattern permission for '{tool_identifier}' (matched '{pattern}'): {perm}",
             )
+
+    # Check global always_allow
+    always_allow = global_config.get("always_allow", [])
+    for allowed_pattern in always_allow:
+        if matches_pattern(tool_identifier, allowed_pattern):
+            return "allow", f"Tool '{tool_identifier}' is globally allowed"
+
+    # Check global always_deny
+    always_deny = global_config.get("always_deny", [])
+    for denied_pattern in always_deny:
+        if matches_pattern(tool_identifier, denied_pattern):
+            return "deny", f"Tool '{tool_identifier}' is globally denied for security"
 
     # Default permission
     default_perm = global_config.get("default_permission", "Ask").lower()
@@ -234,14 +244,15 @@ def evaluate_all_checks(
             "Access to .env files containing sensitive data is prohibited. Use .env.sample for template files instead.",
         )
 
-    # Check 2: Dangerous rm commands (only if enabled in config)
+    # Check 2: Dangerous commands (only if enabled in config)
     if hook_config.get("block_dangerous_commands", True):  # Default True for safety
         if tool_name == "Bash":
             command = tool_input.get("command", "")
-            if is_dangerous_rm_command(command):
+            is_dangerous, danger_type = is_dangerous_command(command)
+            if is_dangerous:
                 return (
                     "deny",
-                    "Dangerous rm command detected and prevented for security",
+                    f"Dangerous {danger_type} detected and prevented for security",
                 )
 
     # Check 3: Worktree permissions
@@ -390,6 +401,12 @@ def get_worktree_permissions(
 ) -> Tuple[Dict[str, Any], Dict[str, Any]]:
     """
     Get the appropriate permissions configuration for a worktree.
+    
+    Implements permission hierarchy:
+    1. Exact worktree match (e.g., worktree_dev_branch)
+    2. Prefix match (e.g., worktree_dev_branch -> worktree_dev)
+    3. Pattern-based rules
+    4. Empty config (falls back to global)
 
     Args:
         worktree_name: Name of the worktree
@@ -399,19 +416,34 @@ def get_worktree_permissions(
         Tuple of (worktree_config, global_config)
     """
     global_config = permissions_config.get("global", {})
-
-    # Check for exact worktree match first
     worktrees = permissions_config.get("worktrees", {})
+
+    # 1. Check for exact worktree match first
     if worktree_name in worktrees:
         return worktrees[worktree_name], global_config
 
-    # Check pattern-based rules
+    # 2. Check for prefix matches (specific > generic)
+    # Generate potential matches by removing parts after underscores
+    # e.g., worktree_dev_branch -> ["worktree_dev_branch", "worktree_dev"]
+    potential_matches = []
+    parts = worktree_name.split("_")
+    for i in range(len(parts), 1, -1):  # From longest to shortest
+        potential_match = "_".join(parts[:i])
+        if potential_match != worktree_name:  # Skip the original (already checked)
+            potential_matches.append(potential_match)
+    
+    # Check each potential match in order of specificity
+    for potential_match in potential_matches:
+        if potential_match in worktrees:
+            return worktrees[potential_match], global_config
+
+    # 3. Check pattern-based rules
     patterns = permissions_config.get("patterns", [])
     pattern_match = match_worktree_patterns(worktree_name, patterns)
     if pattern_match:
         return pattern_match, global_config
 
-    # Return empty worktree config with global config as fallback
+    # 4. Return empty worktree config with global config as fallback
     return {}, global_config
 
 
