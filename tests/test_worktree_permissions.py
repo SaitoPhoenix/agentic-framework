@@ -79,22 +79,22 @@ def main():
             "cwd": "/path/to/worktree_main",
         },
         {
-            "name": "Worktree test - git push (should deny)",
+            "name": "Worktree test - git pull (should deny)",
             "tool_name": "Bash",
-            "tool_input": {"command": "git push origin main"},
+            "tool_input": {"command": "git pull origin main"},
             "cwd": "/path/to/worktree_test",
         },
         {
-            "name": "Worktree dev - git pull (should allow)",
+            "name": "Worktree dev- - git pull (should allow)",
             "tool_name": "Bash",
             "tool_input": {"command": "git pull origin main"},
-            "cwd": "/path/to/worktree_dev",
+            "cwd": "/path/to/worktree_dev-",
         },
         {
-            "name": "Worktree dev_branch - git pull (should allow)",
+            "name": "Worktree dev-branch - git pull (should allow)",
             "tool_name": "Bash",
             "tool_input": {"command": "git pull origin main"},
-            "cwd": "/path/to/worktree_dev_branch",
+            "cwd": "/path/to/worktree_dev-branch",
         },
         {
             "name": "Worktree feature - git status (should allow globally)",
