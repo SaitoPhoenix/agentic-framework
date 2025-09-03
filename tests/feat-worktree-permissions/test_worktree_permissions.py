@@ -34,7 +34,7 @@ def test_permission_check(tool_name: str, tool_input: dict, cwd: str = "") -> di
 
     try:
         # Run the hook script
-        hook_path = Path("../.claude/hooks/pre_tool_use.py")
+        hook_path = Path("../../.claude/hooks/pre_tool_use.py")
         result = subprocess.run(
             [str(hook_path)],
             input=json.dumps(test_input),
@@ -79,9 +79,9 @@ def main():
             "cwd": "/path/to/worktree_main",
         },
         {
-            "name": "Worktree test - git pull (should deny)",
+            "name": "Worktree test - git push (should deny)",
             "tool_name": "Bash",
-            "tool_input": {"command": "git pull origin main"},
+            "tool_input": {"command": "git push origin main"},
             "cwd": "/path/to/worktree_test",
         },
         {
@@ -107,6 +107,24 @@ def main():
             "tool_name": "Bash",
             "tool_input": {"command": "sudo rm -rf /"},
             "cwd": "/path/to/worktree_dev",
+        },
+        {
+            "name": "Non-worktree - sudo command (should deny)",
+            "tool_name": "Bash",
+            "tool_input": {"command": "sudo rm -rf /"},
+            "cwd": "/path/to/something",
+        },
+        {
+            "name": "Non-worktree - rm -rf command (should deny)",
+            "tool_name": "Bash",
+            "tool_input": {"command": "rm -rf /"},
+            "cwd": "/path/to/something",
+        },
+        {
+            "name": "Non-worktree - rm command (should allow)",
+            "tool_name": "Bash",
+            "tool_input": {"command": "rm /"},
+            "cwd": "/path/to/something",
         },
     ]
 
