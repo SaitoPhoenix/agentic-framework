@@ -1,0 +1,166 @@
+# Claude Code Worktree Permissions Configuration
+# This file defines tool permissions for different worktree environments
+# 
+# Permission levels:
+#   - Allow: Tool is permitted without confirmation
+#   - Ask: Tool requires user confirmation (default)
+#   - Deny: Tool is blocked completely
+#
+# Tool naming follows Claude Code format:
+#   - "Bash": All bash commands
+#   - "Bash(git status:*)": Specific bash command patterns
+#   - "Read", "Write", "Edit": File operations
+#   - "WebFetch": Web requests
+
+# Global settings applied to ALL worktrees
+global:
+  # Default permission for unspecified tools
+  default_permission: Ask
+  
+  # Enable/disable worktree permissions entirely
+  enabled: true
+  
+  # Log permission decisions
+  log_permissions: true
+  
+  # Tools that are always allowed in any worktree
+  always_allow:
+    - "Read"
+    - "Bash(pwd:*)"
+    - "Bash(cd:*)"    
+    - "Bash(ls:*)"
+    - "Bash(mkdir:*)"
+    - "Bash(uv:*)"
+    - "Bash(find:*)"
+    - "Bash(mv:*)"
+    - "Bash(grep:*)"
+    - "Bash(npm:*)"
+    - "Bash(cp:*)"
+    - "Bash(chmod:*)"
+    - "Bash(touch:*)"
+    - "Bash(git status:*)"
+    - "Bash(git log:*)"
+    - "Bash(git diff:*)"
+    - "Bash(git show:*)"
+    - "Bash(git branch:*)"
+    - "Bash(git worktree:*)"
+    - "Bash(git rev-parse:*)"
+    - "Grep"
+    - "Glob"
+  
+  # Tools that are always denied in worktrees (security)
+  always_deny:
+    - "Bash(rm -rf:*)"
+    - "Bash(sudo:*)"
+    - "Bash(su:*)"
+    - "Bash(chmod 777:*)"
+    
+
+# Specific worktree configurations
+# Key format: "worktree_BRANCHNAME" matches the worktree directory naming
+worktrees:
+  
+  # Production/main branch worktrees - more restrictive
+  worktree_main:
+    permissions:
+      "Write": Ask
+      "Edit": Ask
+      "MultiEdit": Ask
+      "Bash(git add:*)": Ask
+      "Bash(git commit:*)": Ask
+      "Bash(git push:*)": Deny
+      "Bash(npm:*)": Ask
+      "Bash(python:*)": Ask
+      "Bash(uv:*)": Ask
+      "WebFetch": Deny
+      
+  # Hotfix worktrees - limited permissions
+  worktree_hotfix:
+    permissions:
+      "Write": Ask
+      "Edit": Allow
+      "MultiEdit": Ask
+      "Bash(git add:*)": Allow
+      "Bash(git commit:*)": Allow
+      "Bash(git push:*)": Ask
+      "Bash(npm:*)": Deny
+      "Bash(python:*)": Ask
+      "Bash(uv:*)": Ask
+      "WebFetch": Deny
+      
+  # Testing worktrees - restricted file operations
+  worktree_test:
+    permissions:
+      "Write": Ask
+      "Edit": Ask
+      "MultiEdit": Deny
+      "Bash(git add:*)": Deny
+      "Bash(git commit:*)": Deny
+      "Bash(git push:*)": Deny
+      "Bash(npm test:*)": Allow
+      "Bash(python -m pytest:*)": Allow
+      "Bash(uv run pytest:*)": Allow
+      "WebFetch": Deny
+
+# Pattern-based rules for dynamic worktree names
+# These apply when no exact worktree match is found
+patterns:
+  
+  # Dev branches: worktree_dev-*
+  - pattern: "^worktree_dev-.*"
+    permissions:
+      "Write": Allow
+      "Edit": Allow  
+      "MultiEdit": Allow
+      "Bash(git add:*)": Allow
+      "Bash(git commit:*)": Allow
+      "Bash(git pull:*)": Allow
+      "Bash(npm:*)": Allow
+      "Bash(python:*)": Allow
+      "Bash(uv:*)": Allow
+      "Bash(gh pr:*)": Allow
+      "WebFetch": Ask
+      
+  # Feature branches: worktree_feature-*
+  - pattern: "^worktree_feature-.*"
+    permissions:
+      "Write": Allow
+      "Edit": Allow
+      "MultiEdit": Allow
+      "Bash(git add:*)": Allow
+      "Bash(git commit:*)": Allow
+      "Bash(git push:*)": Ask
+      "WebFetch": Ask
+      
+  # Bugfix branches: worktree_bugfix-* or worktree_fix-*
+  - pattern: "^worktree_(bugfix|fix)-.*"
+    permissions:
+      "Write": Allow
+      "Edit": Allow
+      "MultiEdit": Ask
+      "Bash(git add:*)": Allow
+      "Bash(git commit:*)": Allow
+      "Bash(git push:*)": Ask
+      "WebFetch": Deny
+      
+  # Release branches: worktree_release-*
+  - pattern: "^worktree_release-.*"
+    permissions:
+      "Write": Ask
+      "Edit": Ask
+      "MultiEdit": Ask
+      "Bash(git add:*)": Ask
+      "Bash(git commit:*)": Ask
+      "Bash(git push:*)": Ask
+      "WebFetch": Deny
+      
+  # Experimental branches: worktree_exp-* or worktree_experiment-*
+  - pattern: "^worktree_exp(eriment)?-.*"
+    permissions:
+      "Write": Allow
+      "Edit": Allow
+      "MultiEdit": Allow
+      "Bash(git add:*)": Allow
+      "Bash(git commit:*)": Allow
+      "Bash(git push:*)": Allow
+      "WebFetch": Allow
