@@ -167,7 +167,7 @@ def check_tool_permission(
 ) -> Tuple[str, str]:
     """
     Check permission for a tool based on worktree and global configuration.
-    
+
     Permission hierarchy (highest to lowest precedence):
     1. Worktree-specific permissions (allow/deny/ask)
     2. Global always_allow
@@ -401,12 +401,11 @@ def get_worktree_permissions(
 ) -> Tuple[Dict[str, Any], Dict[str, Any]]:
     """
     Get the appropriate permissions configuration for a worktree.
-    
+
     Implements permission hierarchy:
-    1. Exact worktree match (e.g., worktree_dev_branch)
-    2. Prefix match (e.g., worktree_dev_branch -> worktree_dev)
-    3. Pattern-based rules
-    4. Empty config (falls back to global)
+    1. Exact worktree match (e.g., worktree_dev-branch)
+    2. Pattern-based rules
+    3. Empty config (falls back to global)
 
     Args:
         worktree_name: Name of the worktree
@@ -422,28 +421,13 @@ def get_worktree_permissions(
     if worktree_name in worktrees:
         return worktrees[worktree_name], global_config
 
-    # 2. Check for prefix matches (specific > generic)
-    # Generate potential matches by removing parts after underscores
-    # e.g., worktree_dev_branch -> ["worktree_dev_branch", "worktree_dev"]
-    potential_matches = []
-    parts = worktree_name.split("_")
-    for i in range(len(parts), 1, -1):  # From longest to shortest
-        potential_match = "_".join(parts[:i])
-        if potential_match != worktree_name:  # Skip the original (already checked)
-            potential_matches.append(potential_match)
-    
-    # Check each potential match in order of specificity
-    for potential_match in potential_matches:
-        if potential_match in worktrees:
-            return worktrees[potential_match], global_config
-
-    # 3. Check pattern-based rules
+    # 2. Check pattern-based rules
     patterns = permissions_config.get("patterns", [])
     pattern_match = match_worktree_patterns(worktree_name, patterns)
     if pattern_match:
         return pattern_match, global_config
 
-    # 4. Return empty worktree config with global config as fallback
+    # 3. Return empty worktree config with global config as fallback
     return {}, global_config
 
 
