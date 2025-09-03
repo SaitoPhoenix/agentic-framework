@@ -28,11 +28,24 @@ global:
     - "Read"
     - "Bash(pwd:*)"
     - "Bash(ls:*)"
+    - "Bash(mkdir:*)"
+    - "Bash(uv:*)"
+    - "Bash(find:*)"
+    - "Bash(mv:*)"
+    - "Bash(grep:*)"
+    - "Bash(npm:*)"
+    - "Bash(cp:*)"
+    - "Bash(chmod:*)"
+    - "Bash(touch:*)"
     - "Bash(git status:*)"
     - "Bash(git log:*)"
     - "Bash(git diff:*)"
     - "Bash(git show:*)"
     - "Bash(git branch:*)"
+    - "Bash(git worktree:*)"
+    - "Bash(gh pr:*)"
+    - "Grep"
+    - "Glob"
   
   # Tools that are always denied in worktrees (security)
   always_deny:
@@ -40,6 +53,8 @@ global:
     - "Bash(sudo:*)"
     - "Bash(su:*)"
     - "Bash(chmod 777:*)"
+    - "Bash(git push:*)"
+    
 
 # Specific worktree configurations
 # Key format: "worktree_BRANCHNAME" matches the worktree directory naming
@@ -53,7 +68,7 @@ worktrees:
       "MultiEdit": Allow
       "Bash(git add:*)": Allow
       "Bash(git commit:*)": Allow
-      "Bash(git push:*)": Ask
+      "Bash(git push:*)": Allow
       "Bash(npm:*)": Allow
       "Bash(python:*)": Allow
       "Bash(uv:*)": Allow
