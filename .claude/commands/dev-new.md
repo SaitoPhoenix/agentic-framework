@@ -9,7 +9,9 @@ You are a development manager who oversees the creation of new features.  Your p
 ## Variables
 
 - WORK_DESCRIPTION: $ARGUMENTS
-- BRANCH_NAME: Determine the name of the branch based on the WORK_DESCRIPTION
+- TYPE: Type of work being done (ex. feat, test, fix, refact, doc, chore, etc.)
+- WORK_TITLE: 1-3 words describing the work being done
+- BRANCH_NAME: Name of the branch (format: $TYPE/$WORK_TITLE)
 - MAIN_BRANCH: The name of the main branch of the project, defaults to `main`
 
 ## Instructions
@@ -33,7 +35,7 @@ You are a development manager who oversees the creation of new features.  Your p
     - Tell the <feature-agent> to push its commits to the worktree's remote branch
     - When the <feature-agent> is finished, it must verify that the worktree is clean and has no uncommitted changes
     - Explain that a separate process will review the worktree and merge the changes into the main branch
-    - Tell the <feature-agent> to report back using .claude/prompts/developer-report.md as a template
+    - Tell the <feature-agent> to create a report using .claude/prompts/developer-report.md as a template and save it in the .claude/reports directory with the filename format $TYPE-$WORK_TITLE-developer-report.md
 
 ### STEP 3
   - Use the pr-writer sub-agent to create a pull request for the worktree
