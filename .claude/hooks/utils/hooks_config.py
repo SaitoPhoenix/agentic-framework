@@ -28,7 +28,7 @@ def load_hook_config(hook_name: str) -> Dict[str, Any]:
             # Log to file
     """
     try:
-        config_path = Path(__file__).parent / "hooks_config.yaml"
+        config_path = Path(__file__).parent.parent / "config" / "hooks_config.yaml"
         if config_path.exists():
             with open(config_path, "r") as f:
                 config_data = yaml.safe_load(f)
@@ -47,7 +47,7 @@ def load_global_config() -> Dict[str, Any]:
         Dictionary containing global configuration settings
     """
     try:
-        config_path = Path(__file__).parent / "hooks_config.yaml"
+        config_path = Path(__file__).parent.parent / "config" / "hooks_config.yaml"
         if config_path.exists():
             with open(config_path, "r") as f:
                 config_data = yaml.safe_load(f)
