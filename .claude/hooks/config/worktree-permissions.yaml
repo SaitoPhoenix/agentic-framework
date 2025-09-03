@@ -27,6 +27,7 @@ global:
   always_allow:
     - "Read"
     - "Bash(pwd:*)"
+    - "Bash(cd:*)"    
     - "Bash(ls:*)"
     - "Bash(mkdir:*)"
     - "Bash(uv:*)"
@@ -43,7 +44,7 @@ global:
     - "Bash(git show:*)"
     - "Bash(git branch:*)"
     - "Bash(git worktree:*)"
-    - "Bash(gh pr:*)"
+    - "Bash(git rev-parse:*)"
     - "Grep"
     - "Glob"
   
@@ -53,27 +54,12 @@ global:
     - "Bash(sudo:*)"
     - "Bash(su:*)"
     - "Bash(chmod 777:*)"
-    - "Bash(git push:*)"
     
 
 # Specific worktree configurations
 # Key format: "worktree_BRANCHNAME" matches the worktree directory naming
 worktrees:
   
-  # Development/feature branch worktrees - more permissive
-  worktree_dev:
-    permissions:
-      "Write": Allow
-      "Edit": Allow  
-      "MultiEdit": Allow
-      "Bash(git add:*)": Allow
-      "Bash(git commit:*)": Allow
-      "Bash(git push:*)": Allow
-      "Bash(npm:*)": Allow
-      "Bash(python:*)": Allow
-      "Bash(uv:*)": Allow
-      "WebFetch": Ask
-      
   # Production/main branch worktrees - more restrictive
   worktree_main:
     permissions:
@@ -119,6 +105,22 @@ worktrees:
 # Pattern-based rules for dynamic worktree names
 # These apply when no exact worktree match is found
 patterns:
+  
+  # Dev branches: worktree_dev-*
+  - pattern: "^worktree_dev-.*"
+    permissions:
+      "Write": Allow
+      "Edit": Allow  
+      "MultiEdit": Allow
+      "Bash(git add:*)": Allow
+      "Bash(git commit:*)": Allow
+      "Bash(git pull:*)": Allow
+      "Bash(npm:*)": Allow
+      "Bash(python:*)": Allow
+      "Bash(uv:*)": Allow
+      "Bash(gh pr:*)": Allow
+      "WebFetch": Ask
+      
   # Feature branches: worktree_feature-*
   - pattern: "^worktree_feature-.*"
     permissions:
