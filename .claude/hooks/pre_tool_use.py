@@ -287,8 +287,8 @@ def evaluate_all_checks(
 
             return permission, reason
 
-    # Default: ask if no specific restrictions apply
-    return "ask", "No permissions apply - ask user for permission"
+    # Default: allow if no specific restrictions apply
+    return "allow", "No permissions apply - allow tool call"
 
 
 def log_permission_decision(
