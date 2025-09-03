@@ -8,10 +8,13 @@ color: blue
 
 # Purpose
 
-Creates a git worktree named `worktree_$ARGUMENTS` with a new branch `$ARGUMENTS` based on an updated main branch.
+Creates a git worktree and branch for an isolated development environment.
 
 ## Variables
-ARGUMENTS: [branch_name]
+TYPE: Type of work being done (ex. feat, test, fix, refact, doc, chore, etc.)
+WORK_TITLE: 1-3 words describing the work being done
+BRANCH_NAME: Name of the branch (format: $TYPE/$WORK_TITLE)
+WORKTREE_NAME: Name of the worktree (format: worktree_$TYPE-$WORK_TITLE)
 
 ## Instructions
 
@@ -22,7 +25,7 @@ ARGUMENTS: [branch_name]
 
 2. Check for uncommitted changes:
    - If there are untracked files or staged/unstaged changes:
-     - Create a stash: `git stash push -m "Auto-stash before creating worktree $ARGUMENTS"`
+     - Create a stash: `git stash push -m "Auto-stash before creating worktree for $BRANCH_NAME"`
    - If working tree is clean, continue to step 3
 
 3. Update main branch:
@@ -30,9 +33,9 @@ ARGUMENTS: [branch_name]
    - Pull latest changes: `git pull origin main`
 
 4. Create the worktree:
-   - `git worktree add -b "$ARGUMENTS" "worktree_${ARGUMENTS}" main`
+   - `git worktree add -b "$BRANCH_NAME" "$WORKTREE_NAME" main`
 
 5. Confirm successful creation and provide:
-   - Worktree path: `./worktree_${ARGUMENTS}`
-   - Branch name: `$ARGUMENTS`
+   - Worktree path: `./$WORKTREE_NAME`
+   - Branch name: `$BRANCH_NAME`
    - Reminder about any stashed changes if applicable
