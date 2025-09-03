@@ -195,6 +195,102 @@ def check_tool_permission(tool_identifier: str, worktree_config: Dict[str, Any],
     default_perm = global_config.get('default_permission', 'Ask').lower()
     return default_perm, f"Using default permission for '{tool_identifier}': {default_perm}"
 
+
+def evaluate_all_checks(tool_name: str, tool_input: Dict[str, Any], input_data: Dict[str, Any], 
+                       hook_config: Dict[str, Any]) -> Tuple[str, str]:
+    """
+    Centralized function to evaluate all security and permission checks.
+    
+    Args:
+        tool_name: Name of the tool being used
+        tool_input: Input parameters for the tool
+        input_data: Full input data including cwd, etc.
+        hook_config: Hook configuration
+        
+    Returns:
+        Tuple of (permission_decision, reason)
+    """
+    # Check 1: .env file access (always blocks access to sensitive environment files)
+    if is_env_file_access(tool_name, tool_input):
+        return "deny", "Access to .env files containing sensitive data is prohibited. Use .env.sample for template files instead."
+    
+    # Check 2: Dangerous rm commands (only if enabled in config)
+    if hook_config.get('block_dangerous_commands', True):  # Default True for safety
+        if tool_name == 'Bash':
+            command = tool_input.get('command', '')
+            if is_dangerous_rm_command(command):
+                return "deny", "Dangerous rm command detected and prevented for security"
+    
+    # Check 3: Worktree permissions
+    cwd = input_data.get('cwd', '')
+    worktree_name = detect_worktree_from_cwd(cwd)
+    
+    if worktree_name:
+        # We're in a worktree - check permissions
+        permissions_config = load_worktree_permissions()
+        
+        # Only apply worktree permissions if they're enabled
+        if permissions_config.get('global', {}).get('enabled', True):
+            worktree_config, global_config = get_worktree_permissions(worktree_name, permissions_config)
+            
+            # Format the tool identifier
+            tool_identifier = format_tool_identifier(tool_name, tool_input)
+            
+            # Check permission and return the result
+            permission, reason = check_tool_permission(tool_identifier, worktree_config, global_config)
+            
+            # Log permission decision if enabled
+            if global_config.get('log_permissions', True) and should_log_to_file('pre_tool_use'):
+                log_permission_decision(input_data, worktree_name, tool_identifier, permission, reason)
+            
+            return permission, reason
+    
+    # Default: allow if no specific restrictions apply
+    return "allow", "No restrictions apply - tool usage allowed"
+
+
+def log_permission_decision(input_data: Dict[str, Any], worktree_name: str, 
+                          tool_identifier: str, permission: str, reason: str) -> None:
+    """
+    Log permission decision to file if logging is enabled.
+    
+    Args:
+        input_data: Original input data
+        worktree_name: Name of the current worktree
+        tool_identifier: Formatted tool identifier
+        permission: Permission decision
+        reason: Reason for the decision
+    """
+    permission_log_data = {
+        **input_data,
+        'worktree_name': worktree_name,
+        'tool_identifier': tool_identifier,
+        'permission_decision': permission,
+        'permission_reason': reason
+    }
+    
+    # Ensure log directory exists
+    log_dir = get_log_directory()
+    log_dir.mkdir(parents=True, exist_ok=True)
+    log_path = log_dir / 'pre_tool_use.json'
+    
+    # Read existing log data or initialize empty list
+    if log_path.exists():
+        with open(log_path, 'r') as f:
+            try:
+                log_data = json.load(f)
+            except (json.JSONDecodeError, ValueError):
+                log_data = []
+    else:
+        log_data = []
+    
+    # Append new data
+    log_data.append(permission_log_data)
+    
+    # Write back to file with formatting
+    with open(log_path, 'w') as f:
+        json.dump(log_data, f, indent=2)
+
 def matches_pattern(tool_identifier: str, pattern: str) -> bool:
     """
     Check if a tool identifier matches a permission pattern.
@@ -302,108 +398,27 @@ def main():
         # Load configuration
         hook_config = load_hook_config('pre_tool_use')
         
-        # Check for .env file access (always blocks access to sensitive environment files)
-        if is_env_file_access(tool_name, tool_input):
-            print("BLOCKED: Access to .env files containing sensitive data is prohibited", file=sys.stderr)
-            print("Use .env.sample for template files instead", file=sys.stderr)
-            sys.exit(2)  # Exit code 2 blocks tool call and shows error to Claude
+        # Centralized evaluation of all checks
+        permission, reason = evaluate_all_checks(tool_name, tool_input, input_data, hook_config)
         
-        # Check for dangerous rm commands only if enabled in config
-        if hook_config.get('block_dangerous_commands', True):  # Default True for safety
-            if tool_name == 'Bash':
-                command = tool_input.get('command', '')
-                
-                # Block rm -rf commands with comprehensive pattern matching
-                if is_dangerous_rm_command(command):
-                    print("BLOCKED: Dangerous rm command detected and prevented", file=sys.stderr)
-                    sys.exit(2)  # Exit code 2 blocks tool call and shows error to Claude
+        # Create standardized output for all decisions
+        output = create_permission_output(permission, reason)
+        print(json.dumps(output))
         
-        # NEW: Check worktree permissions
+        # Regular logging for non-worktree calls or when worktree permissions are disabled
+        # (Note: Worktree-specific logging is handled within evaluate_all_checks)
         cwd = input_data.get('cwd', '')
         worktree_name = detect_worktree_from_cwd(cwd)
+        if not worktree_name and should_log_to_file('pre_tool_use'):
+            log_regular_tool_usage(input_data)
         
-        if worktree_name:
-            # We're in a worktree - check permissions
-            permissions_config = load_worktree_permissions()
-            
-            # Only apply worktree permissions if they're enabled
-            if permissions_config.get('global', {}).get('enabled', True):
-                worktree_config, global_config = get_worktree_permissions(worktree_name, permissions_config)
-                
-                # Format the tool identifier
-                tool_identifier = format_tool_identifier(tool_name, tool_input)
-                
-                # Check permission
-                permission, reason = check_tool_permission(tool_identifier, worktree_config, global_config)
-                
-                # Log permission decision if enabled
-                if global_config.get('log_permissions', True) and should_log_to_file('pre_tool_use'):
-                    permission_log_data = {
-                        **input_data,
-                        'worktree_name': worktree_name,
-                        'tool_identifier': tool_identifier,
-                        'permission_decision': permission,
-                        'permission_reason': reason
-                    }
-                    
-                    # Ensure log directory exists
-                    log_dir = get_log_directory()
-                    log_dir.mkdir(parents=True, exist_ok=True)
-                    log_path = log_dir / 'pre_tool_use.json'
-                    
-                    # Read existing log data or initialize empty list
-                    if log_path.exists():
-                        with open(log_path, 'r') as f:
-                            try:
-                                log_data = json.load(f)
-                            except (json.JSONDecodeError, ValueError):
-                                log_data = []
-                    else:
-                        log_data = []
-                    
-                    # Append new data
-                    log_data.append(permission_log_data)
-                    
-                    # Write back to file with formatting
-                    with open(log_path, 'w') as f:
-                        json.dump(log_data, f, indent=2)
-                
-                # Create and output permission decision
-                output = create_permission_output(permission, reason)
-                print(json.dumps(output))
-                
-                # Exit based on permission decision
-                if permission == "deny":
-                    sys.exit(2)  # Block tool call
-                elif permission == "ask":
-                    sys.exit(1)  # Ask for confirmation
-                else:  # "allow"
-                    sys.exit(0)  # Allow tool call
-            
-        # Regular logging for non-worktree calls or when worktree permissions are disabled
-        elif should_log_to_file('pre_tool_use'):
-            # Ensure log directory exists
-            log_dir = get_log_directory()
-            log_dir.mkdir(parents=True, exist_ok=True)
-            log_path = log_dir / 'pre_tool_use.json'
-            
-            # Read existing log data or initialize empty list
-            if log_path.exists():
-                with open(log_path, 'r') as f:
-                    try:
-                        log_data = json.load(f)
-                    except (json.JSONDecodeError, ValueError):
-                        log_data = []
-            else:
-                log_data = []
-            
-            # Append new data
-            log_data.append(input_data)
-            
-            # Write back to file with formatting
-            with open(log_path, 'w') as f:
-                json.dump(log_data, f, indent=2)
-        
+        # Single exit point with proper decision handling
+        if permission == "deny":
+            sys.exit(2)  # Block tool call
+        elif permission == "ask":
+            sys.exit(1)  # Ask for confirmation
+        else:  # "allow"
+            sys.exit(0)  # Allow tool call
         
     except json.JSONDecodeError:
         # Gracefully handle JSON decode errors
@@ -411,6 +426,36 @@ def main():
     except Exception:
         # Handle any other errors gracefully
         sys.exit(0)
+
+
+def log_regular_tool_usage(input_data: Dict[str, Any]) -> None:
+    """
+    Log regular tool usage for non-worktree calls when logging is enabled.
+    
+    Args:
+        input_data: Original input data to log
+    """
+    # Ensure log directory exists
+    log_dir = get_log_directory()
+    log_dir.mkdir(parents=True, exist_ok=True)
+    log_path = log_dir / 'pre_tool_use.json'
+    
+    # Read existing log data or initialize empty list
+    if log_path.exists():
+        with open(log_path, 'r') as f:
+            try:
+                log_data = json.load(f)
+            except (json.JSONDecodeError, ValueError):
+                log_data = []
+    else:
+        log_data = []
+    
+    # Append new data
+    log_data.append(input_data)
+    
+    # Write back to file with formatting
+    with open(log_path, 'w') as f:
+        json.dump(log_data, f, indent=2)
 
 if __name__ == '__main__':
     main()
