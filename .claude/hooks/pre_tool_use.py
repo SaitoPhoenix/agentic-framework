@@ -92,6 +92,28 @@ def is_env_file_access(tool_name, tool_input):
     return False
 
 
+def load_settings_permissions() -> Dict[str, Any]:
+    """
+    Load permissions configuration from .claude/settings.json.
+
+    Returns:
+        Dictionary containing permissions configuration from settings.json,
+        or empty dict if file doesn't exist or can't be loaded.
+    """
+    try:
+        # Look for .claude/settings.json relative to the script location
+        # Script is in .claude/hooks/, so settings.json is in parent directory
+        settings_path = Path(__file__).parent.parent / "settings.json"
+        if settings_path.exists():
+            with open(settings_path, "r") as f:
+                data = json.load(f)
+                return data.get("permissions", {})
+    except Exception:
+        # If settings loading fails, return empty dict
+        pass
+    return {}
+
+
 def load_worktree_permissions() -> Dict[str, Any]:
     """
     Load worktree permissions configuration from config/worktree-permissions.yaml.
@@ -172,7 +194,8 @@ def check_tool_permission(
     1. Worktree-specific permissions (allow/deny/ask)
     2. Global always_allow
     3. Global always_deny
-    4. Default permission
+    4. Settings.json permissions (allow/deny)
+    5. Default permission
 
     Args:
         tool_identifier: Formatted tool identifier
@@ -210,6 +233,21 @@ def check_tool_permission(
     for denied_pattern in always_deny:
         if matches_pattern(tool_identifier, denied_pattern):
             return "deny", f"Tool '{tool_identifier}' is globally denied for security"
+
+    # Check settings.json permissions
+    settings_permissions = load_settings_permissions()
+    if settings_permissions:
+        # Check settings.json allow patterns
+        settings_allow = settings_permissions.get("allow", [])
+        for allowed_pattern in settings_allow:
+            if matches_pattern(tool_identifier, allowed_pattern):
+                return "allow", f"Tool '{tool_identifier}' is allowed by settings.json configuration"
+        
+        # Check settings.json deny patterns
+        settings_deny = settings_permissions.get("deny", [])
+        for denied_pattern in settings_deny:
+            if matches_pattern(tool_identifier, denied_pattern):
+                return "deny", f"Tool '{tool_identifier}' is denied by settings.json configuration"
 
     # Default permission
     default_perm = global_config.get("default_permission", "Ask").lower()
@@ -287,6 +325,22 @@ def evaluate_all_checks(
 
             return permission, reason
 
+    # Check settings.json permissions for non-worktree contexts
+    tool_identifier = format_tool_identifier(tool_name, tool_input)
+    settings_permissions = load_settings_permissions()
+    if settings_permissions:
+        # Check settings.json allow patterns
+        settings_allow = settings_permissions.get("allow", [])
+        for allowed_pattern in settings_allow:
+            if matches_pattern(tool_identifier, allowed_pattern):
+                return "allow", f"Tool '{tool_identifier}' is allowed by settings.json configuration"
+        
+        # Check settings.json deny patterns
+        settings_deny = settings_permissions.get("deny", [])
+        for denied_pattern in settings_deny:
+            if matches_pattern(tool_identifier, denied_pattern):
+                return "deny", f"Tool '{tool_identifier}' is denied by settings.json configuration"
+
     # Default: allow if no specific restrictions apply
     return "allow", "No permissions apply - allow tool call"
 
@@ -354,12 +408,7 @@ def matches_pattern(tool_identifier: str, pattern: str) -> bool:
     if tool_identifier == pattern:
         return True
 
-    # Wildcard pattern matching
-    if pattern.endswith(":*"):
-        pattern_prefix = pattern[:-2]
-        return tool_identifier.startswith(pattern_prefix)
-
-    # For bash commands, also check if the base command matches
+    # For bash commands, handle special matching logic
     if tool_identifier.startswith("Bash(") and pattern.startswith("Bash("):
         # Extract command parts
         tool_cmd = (
@@ -369,9 +418,16 @@ def matches_pattern(tool_identifier: str, pattern: str) -> bool:
         )
         pattern_cmd = pattern[5:-3] if pattern.endswith(":*)") else pattern[5:-1]
 
-        # Check for partial command matching (e.g., "git" should match "git status")
-        if pattern.endswith(":*"):
+        # Check for partial command matching (e.g., "uv" should match "uv sync")
+        if pattern.endswith(":*)"):
             return tool_cmd.startswith(pattern_cmd)
+        else:
+            return tool_cmd == pattern_cmd
+
+    # General wildcard pattern matching for non-bash tools
+    if pattern.endswith(":*"):
+        pattern_prefix = pattern[:-2]
+        return tool_identifier.startswith(pattern_prefix)
 
     return False
 
