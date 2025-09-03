@@ -116,20 +116,22 @@ patterns:
       "Bash(git commit:*)": Allow
       "Bash(git pull:*)": Allow
       "Bash(npm:*)": Allow
-      "Bash(python:*)": Allow
       "Bash(uv:*)": Allow
       "Bash(gh pr:*)": Allow
       "WebFetch": Ask
       
-  # Feature branches: worktree_feature-*
-  - pattern: "^worktree_feature-.*"
+  # Feature branches: worktree_feat-*
+  - pattern: "^worktree_feat-.*"
     permissions:
       "Write": Allow
-      "Edit": Allow
+      "Edit": Allow  
       "MultiEdit": Allow
       "Bash(git add:*)": Allow
       "Bash(git commit:*)": Allow
-      "Bash(git push:*)": Ask
+      "Bash(git pull:*)": Allow
+      "Bash(npm:*)": Allow
+      "Bash(uv:*)": Allow
+      "Bash(gh pr:*)": Allow
       "WebFetch": Ask
       
   # Bugfix branches: worktree_bugfix-* or worktree_fix-*

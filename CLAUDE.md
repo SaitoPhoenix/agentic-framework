@@ -73,3 +73,8 @@ Resolves: #123
 EOF
 )"
 ```
+
+# Important Directories
+
+- `tests/` - All test files (Test suites should have their own subdirectory)
+- `.claude/reports/` - Reports from AI agents
