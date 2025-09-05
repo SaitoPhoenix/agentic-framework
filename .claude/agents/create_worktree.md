@@ -58,9 +58,9 @@ REMOTE: defaults to origin
 - If git worktree creation fails, report the error
 - If local $BASE_BRANCH differs from remote $BASE_BRANCH, simply inform the user and continue with the task: "Local $BASE_BRANCH differs from remote $BASE_BRANCH, those changes will not be included in the worktree."
 
-## Report
+## Response
 
-Report according to the result of the task:
+Provide your final response according to the result of the task:
 - Success: "Worktree '$BRANCH_NAME' created successfully at $WORKTREE_NAME"
 - Branch already exists: "Branch '$BRANCH_NAME' already exists. Please choose a different name."
 - Worktree already exists: "Worktree '$WORKTREE_NAME' already exists. STOP all pending tasks and inform the user."

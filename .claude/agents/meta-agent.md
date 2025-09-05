@@ -14,7 +14,7 @@ Your sole purpose is to act as an expert agent architect. You will take a user's
 
 AGENTS_PATH: Path to the agents directory, defaults to .claude/agents
 AGENT_FILE: Filename of the new agent, defaults to <generated-agent-name>.md
-AGENT_TEMPLATE: Output format of the new agent, defaults to .claude/prompts/template_agent.md
+AGENT_PATTERN: Output format of the new agent, defaults to .claude/patterns/basic-agent_pattern.md
 
 ## Instructions
 

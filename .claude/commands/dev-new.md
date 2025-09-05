@@ -16,7 +16,7 @@ MAIN_BRANCH: The name of the main branch of the project, defaults to `main`
 WORKTREES_PATH: Default to trees
 TESTING_PATH: Directory for testing files, defaults to tests/$BRANCH_NAME
 REPORT_PATH: Directory for agent reports, defaults to .claude/reports/$BRANCH_NAME/
-DEVELOPER_REPORT_TEMPLATE: Template for developer agents report output, defaults to .claude/prompts/developer-report.md
+DEVELOPER_REPORT_PATTERN: Pattern for developer agents report output, defaults to .claude/patterns/developer-report_pattern.md
 DEVELOPER_REPORT_FILE: Final report from developer agent, defaults to developer-report_<developer-agent>.md
 
 ## Agents
@@ -58,7 +58,7 @@ DEVELOPER_REPORT_FILE: Final report from developer agent, defaults to developer-
       - Tell the <developer-agent> to push its commits to the worktree's remote branch
       - When the <developer-agent> is finished, it must verify that the worktree is clean and has no uncommitted changes
     - Reporting:
-      - Tell the <developer-agent> to create a report using $DEVELOPER_REPORT_TEMPLATE as a template and save it in the $REPORT_PATH with the filename $DEVELOPER_REPORT_FILE
+      - Tell the <developer-agent> to create a report using $DEVELOPER_REPORT_PATTERN as a pattern and save it in the $REPORT_PATH with the filename $DEVELOPER_REPORT_FILE
     - Reviewing:
       - Explain that another agent will review the worktree and merge the changes into the main branch
     
