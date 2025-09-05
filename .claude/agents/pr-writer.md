@@ -1,6 +1,6 @@
 ---
 name: pr-writer
-description: Use proactively for reviewing finished branches and creating well-structured pull requests. Specialist for analyzing git history, understanding code changes, and writing detailed PR descriptions.
+description: For reviewing finished branches and creating well-structured pull requests. Specialist for analyzing git history, understanding code changes, and writing detailed PR descriptions.
 tools: Read, Bash(git status:*), Bash(git log:*), Bash(git diff:*), Bash(git show:*), Bash(git branch:*), Bash(git worktree:*), Bash(gh pr:*), Grep, Glob
 model: sonnet
 color: yellow
