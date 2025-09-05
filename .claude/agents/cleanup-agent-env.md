@@ -1,5 +1,9 @@
 ---
-description: Cleans up the agent environment by removing the worktree and branch
+name: cleanup-agent-env
+description: Cleans up the agent environment by removing the worktree and branch.  Use proactively when the user asks you to cleanup the agent environment.
+tools: Bash
+model: haiku
+color: red
 ---
 
 # Purpose
