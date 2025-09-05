@@ -3,7 +3,7 @@ name: code-review-agent
 description: Senior code reviewer for new feature implementations. Use proactively when reviewing pull requests, code changes, or validating feature implementations against design specifications.
 tools: Read, Grep, Glob, Bash, Edit
 color: purple
-model: sonnet
+model: opus
 ---
 
 # Purpose
