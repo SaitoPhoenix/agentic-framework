@@ -1,6 +1,6 @@
 ---
 name: claude-configuration-dev
-description: For developing Claude Code features including hooks, output styles, status lines, commands, and utility files for seamless integration
+description: Only used to develop Claude Code features including hooks, output styles, status lines, and commands.  Only works in .claude/ directories.
 tools: Read, Write, MultiEdit, Bash, WebFetch, Glob, Grep
 model: sonnet
 color: cyan
