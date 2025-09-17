@@ -5,18 +5,21 @@ description: Load context for a new agent session by analyzing codebase structur
 
 # Prime
 
-Run the commands under the `Execute` section to gather information about the project, and then review the files listed under `Read` to understand the project's purpose and functionality then `Report` your findings.
+Run commands and read files to get a high level understanding of the project.
 
-## Execute
-- `git ls-files`
+## Workflow
+1. *Run:* `eza --tree --only-dirs --all --ignore-glob=".git|__*|node_modules|dist|build|.vscode|.idea|.venv|target|coverage|.cursor"`
+2. *Run:* `git status`
+3. *Run:* `git diff HEAD origin/main`
+4. *Run:* `git branch --show-current`
+5. *Read:* Review the files listed under `Read` to understand the project's purpose and functionality
+6. *Report:* Provide a summary of your understanding of the project
 
-## Read
+### Read
 - README.md
-- ai_docs/cc_hooks_docs.md
-- ai_docs/uv-single-file-scripts.md
-- ai_docs/anthropic_custom_slash_commands.md
-- ai_docs/anthropic_docs_subagents.md
 
 ## Report
 
 - Provide a summary of your understanding of the project
+- Include key directories, describing their purpose
+- Inform the user of the current state of the git repository
