@@ -1,0 +1,33 @@
+hierarchical:
+  - manages                 # Entity has direct authority over another.
+  - reports_to              # Entity is accountable to a higher authority.
+  - is_part_of              # Entity is a component of a larger whole.
+  - contains                # Entity encompasses smaller components.
+  - owned_by                # Entity belongs to or is possessed by another.
+
+associative:
+  - collaborates_with       # Mutual cooperation between peers toward a shared goal.
+  - works_on                # Entity actively contributes effort to a project or task.
+  - uses                    # Entity employs a tool or technology to perform a function.
+  - prefers                 # A non-binding partiality for one option over another.
+  - works_with              # Entities function together in a complementary manner.
+  - complements             # Entity enhances or completes another entity.
+
+influence:
+  - influences              # Entity has an indirect effect on the outcome of another.
+  - depends_on              # A critical, one-way reliance on another entity to function.
+  - competes_with           # Entities are rivals for the same role or resource.
+  - enables                 # Entity provides the necessary capability for another to succeed.
+  - guides                  # Entity provides direction or principles for another.
+
+action-based:
+  - proposed                # Entity formally suggested an idea, plan, or action.
+  - decided_on              # Entity made a final choice or resolution.
+  - completed               # Entity finished a task, project, or milestone.
+  - assigned_to             # Designates responsibility for a task to an entity.
+  - designed                # Entity created the architecture or structure of another.
+  - designed_by             # Entity was architecturally created by another.
+  - leads                   # Entity directs or is in charge of another.
+  - preferred_by            # Entity is favored or chosen by another.
+  - used_by                 # Entity is utilized or employed by another.
+  - guided_by               # Entity receives direction or principles from another.
