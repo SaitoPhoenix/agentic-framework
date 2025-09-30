@@ -19,13 +19,24 @@
     "deny": []
   },
   "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "uv run $CLAUDE_PROJECT_DIR/.claude/hooks/hook_entry.py --hook session_start"
+          }
+        ]
+      }
+    ],
     "PreToolUse": [
       {
         "matcher": "",
         "hooks": [
           {
             "type": "command",
-            "command": "uv run $CLAUDE_PROJECT_DIR/.claude/hooks/pre_tool_use.py"
+            "command": "uv run $CLAUDE_PROJECT_DIR/.claude/hooks/hook_entry.py --hook pre_tool_use"
           }
         ]
       }
@@ -36,7 +47,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "uv run $CLAUDE_PROJECT_DIR/.claude/hooks/post_tool_use.py"
+            "command": "uv run $CLAUDE_PROJECT_DIR/.claude/hooks/hook_entry.py --hook post_tool_use"
           }
         ]
       }
@@ -47,7 +58,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "uv run $CLAUDE_PROJECT_DIR/.claude/hooks/notification.py"
+            "command": "uv run $CLAUDE_PROJECT_DIR/.claude/hooks/hook_entry.py --hook notification"
           }
         ]
       }
@@ -58,7 +69,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "uv run $CLAUDE_PROJECT_DIR/.claude/hooks/stop.py"
+            "command": "uv run $CLAUDE_PROJECT_DIR/.claude/hooks/hook_entry.py --hook stop"
           }
         ]
       }
@@ -69,43 +80,44 @@
         "hooks": [
           {
             "type": "command",
-            "command": "uv run $CLAUDE_PROJECT_DIR/.claude/hooks/subagent_stop.py"
+            "command": "uv run $CLAUDE_PROJECT_DIR/.claude/hooks/hook_entry.py --hook subagent_stop"
           }
         ]
       }
-    ],
-    "UserPromptSubmit": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "uv run $CLAUDE_PROJECT_DIR/.claude/hooks/user_prompt_submit.py"
-          }
-        ]
-      }
-    ],
+    ],      
     "PreCompact": [
       {
         "matcher": "",
         "hooks": [
           {
             "type": "command",
-            "command": "uv run $CLAUDE_PROJECT_DIR/.claude/hooks/pre_compact.py"
+            "command": "uv run $CLAUDE_PROJECT_DIR/.claude/hooks/hook_entry.py --hook pre_compact"
           }
         ]
       }
-    ],
-    "SessionStart": [
+    ],   
+    "UserPromptSubmit": [
       {
         "matcher": "",
         "hooks": [
           {
             "type": "command",
-            "command": "uv run $CLAUDE_PROJECT_DIR/.claude/hooks/session_start.py"
+            "command": "uv run $CLAUDE_PROJECT_DIR/.claude/hooks/hook_entry.py --hook user_prompt_submit"
           }
         ]
       }
-    ]
+    ],                 
+    "SessionEnd": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "uv run $CLAUDE_PROJECT_DIR/.claude/hooks/hook_entry.py --hook session_end"
+          }
+        ]
+      }
+    ]    
   },
   "statusLine": {
     "type": "command",
