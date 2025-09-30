@@ -1,87 +1,139 @@
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
+# ===================================================================
+# General Build & Distribution
+# ===================================================================
+# Build and distribution directories
+build/
+dist/
+
+# ===================================================================
+# Python 🐍
+# ===================================================================
+# Virtual environments
 env/
 venv/
+.venv/
 ENV/
 env.bak/
 venv.bak/
-.venv
-pip-log.txt
-pip-delete-this-directory.txt
-.tox/
-.coverage
-.coverage.*
-.cache
+
+# Compiled, cached, and temporary Python files
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+.cache/
 .pytest_cache/
-nosetests.xml
-coverage.xml
-*.cover
-.hypothesis/
-.pytype/
 .mypy_cache/
+.pytype/
+.hypothesis/
+.pyre/
 .dmypy.json
 dmypy.json
-.pyre/
-*.egg-info/
-dist/
-build/
-*.egg
+.ipynb_checkpoints/
+*.so
+*_cache/
 
-# TypeScript
+# Distribution / packaging
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+develop-eggs/
+*.egg-info/
+*.egg
+.installed.cfg
+target/
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Documentation & Translations
+docs/_build/
+*.mo
+*.pot
+
+# ===================================================================
+# TypeScript / JavaScript 📜
+# ===================================================================
+# Dependencies
 node_modules/
-*.tsbuildinfo
-.npm
-.eslintcache
-.node_repl_history
-*.tgz
-.yarn-integrity
-.yarn/cache
-.yarn/unplugged
-.yarn/build-state.yml
-.yarn/install-state.gz
+.npm/
 .pnp.*
-dist/
-build/
+
+# Yarn specific
+.yarn/
+.yarn-integrity
+
+# Build & Cache
+*.tsbuildinfo
+.eslintcache
 *.js.map
 *.d.ts.map
+*.tgz
 
-# IDEs
+# History
+.node_repl_history
+
+# ===================================================================
+# IDE & Editor Configuration
+# ===================================================================
+# Visual Studio Code
 .vscode/
+*.code-workspace
+
+# JetBrains (IntelliJ, PyCharm, etc.)
 .idea/
-*.swp
-*.swo
-*~
-.project
-.classpath
-.c9/
-*.launch
-.settings/
+
+# Sublime Text
 *.sublime-workspace
 *.sublime-project
 
-# OS
+# Vim
+*.swp
+*.swo
+*~
+
+# Spyder
+.spyproject/
+
+# Other IDEs
+.project
+.classpath
+.settings/
+.c9/
+*.launch
+
+# ===================================================================
+# Operating System Files
+# ===================================================================
+# macOS
 .DS_Store
 .DS_Store?
 ._*
 .Spotlight-V100
 .Trashes
-ehthumbs.db
-Thumbs.db
-.directory
 .Apple*
 .LSOverride
 
-# Environment
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+# Windows
+Thumbs.db
+ehthumbs.db
 
+# Linux
+.directory
+
+# ===================================================================
+# General Purpose
+# ===================================================================
 # Logs
 logs/
 *.log
@@ -90,27 +142,45 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 
-# Testing
-htmlcov/
+# Testing & code coverage
 .coverage
-.nyc_output
+.coverage.*
 coverage/
+coverage.xml
+htmlcov/
+nosetests.xml
+*.cover
+.tox/
+.nyc_output/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Databases
+*.db
+*.rdb
 
 # Temporary files
+tmp/
+temp/
 *.tmp
 *.temp
 *.bak
-.cache/
-tmp/
-temp/
 
-# Claude Code data
+# ===================================================================
+# Project Specific
+# ===================================================================
+# Claude data
+#.claude/
 .claude/data/
 .claude-trace/
+.claude/agents/memory/episodic/*
+.claude/hooks/pid/*
 .mcp.json
+.claude/commands/temp.md
+#CLAUDE.md
 
-# Slack configurations
+# Slack data
 slack-bots.md
-
-# Worktrees
-trees/
