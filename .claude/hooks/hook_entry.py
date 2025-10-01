@@ -4,6 +4,11 @@
 # dependencies = [
 #     "python-dotenv",
 #     "pyyaml",
+#     "pyprojroot",
+#     "pydantic-ai-slim[openai,anthropic]",
+#     "pydantic",
+#     "pydantic-settings",
+#     "typer",
 # ]
 # ///
 
