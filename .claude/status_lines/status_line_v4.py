@@ -3,6 +3,7 @@
 # requires-python = ">=3.11"
 # dependencies = [
 #     "python-dotenv",
+#     "pyprojroot",
 # ]
 # ///
 
@@ -31,9 +32,8 @@ NOTE: This is the currently active version (v4) configured in settings.json
 """
 
 import json
-import os
 import sys
-from pathlib import Path
+from pyprojroot import here
 from datetime import datetime
 
 try:
@@ -47,7 +47,7 @@ except ImportError:
 def log_status_line(input_data, status_line_output, error_message=None):
     """Log status line event to logs directory."""
     # Ensure logs directory exists
-    log_dir = Path("logs")
+    log_dir = here() / "logs"
     log_dir.mkdir(parents=True, exist_ok=True)
     log_file = log_dir / "status_line.json"
 
@@ -82,7 +82,7 @@ def log_status_line(input_data, status_line_output, error_message=None):
 
 def get_session_data(session_id):
     """Get session data including agent name, prompts, and extras."""
-    session_file = Path(f".claude/data/sessions/{session_id}.json")
+    session_file = here() / f".claude/data/sessions/{session_id}.json"
 
     if not session_file.exists():
         return None, f"Session file {session_file} does not exist"
@@ -128,7 +128,7 @@ def format_extras(extras):
     """Format extras dictionary into a compact string."""
     if not extras:
         return None
-    
+
     # Format each key-value pair
     pairs = []
     for key, value in extras.items():
@@ -137,7 +137,7 @@ def format_extras(extras):
         if len(str_value) > 20:
             str_value = str_value[:17] + "..."
         pairs.append(f"{key}:{str_value}")
-    
+
     return " ".join(pairs)
 
 
