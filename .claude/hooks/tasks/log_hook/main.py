@@ -10,6 +10,7 @@ import json
 import sys
 from pathlib import Path
 from typing import Dict, Any
+from pyprojroot import here
 
 
 def log_hook_data(
@@ -33,9 +34,9 @@ def log_hook_data(
             # Try to infer from context or use a default
             hook_name = input_data.get("hook_event_name", "unknown_hook")
 
-        # Get log directory from global config
+        # Get log directory from global config (always in project root)
         log_dir_name = global_config.get("log_directory", "logs")
-        log_dir = Path.cwd() / log_dir_name
+        log_dir = here() / log_dir_name
         log_dir.mkdir(exist_ok=True)
 
         # Create hook-specific log file path
