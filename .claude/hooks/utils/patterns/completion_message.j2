@@ -7,14 +7,14 @@ Requirements:
 - Focus on completion/readiness
 - Do NOT include quotes, formatting, or explanations
 - Return ONLY the completion message text
-{% if engineer_name %}
-- Sometimes (about 30% of the time) include the engineer's name '{{ engineer_name }}' in a natural way.
+{% if user_name %}
+- Sometimes (about 30% of the time) include the user's name '{{ user_name }}' in a natural way.
 {% endif %}
 
-{% if engineer_name %}
+{% if user_name %}
 Examples of the style:
 - Standard: "Work complete!", "All done!", "Task finished!", "Ready for your next move!"
-- Personalized: "{{ engineer_name }}, all set!", "Ready for you, {{ engineer_name }}!", "Complete, {{ engineer_name }}!", "{{ engineer_name }}, we're done!"
+- Personalized: "{{ user_name }}, all set!", "Ready for you, {{ user_name }}!", "Complete, {{ user_name }}!", "{{ user_name }}, we're done!"
 {% else %}
 Examples of the style: "Work complete!", "All done!", "Task finished!", "Ready for your next move!"
 {% endif %}
