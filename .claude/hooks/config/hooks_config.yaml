@@ -10,6 +10,29 @@ stop:
     function: "log_hook_data"
     config:
       hook_name: "stop"
+  tts_notification:
+    enabled: true
+    module: "tts_notification.main"
+    function: "announce_tts"
+    config:
+      tts:  # Used to play audio of the message
+        provider: "elevenlabs" # openai, gcloud, elevenlabs, pyttsx3 (default)
+        # gcloud voices: en-US-Chirp3-HD-Despina, en-US-Wavenet-F
+        # openai voices: alloy, echo, fable, onyx, nova, shimmer
+        # elevenlabs voices: WejK3H1m7MI9CHnIjW9K, fUjY9K2nAIwlALOwSiwc
+        voice: "fUjY9K2nAIwlALOwSiwc"
+        # elevenlabs models: eleven_turbo_v2_5, eleven_multilingual_v2
+        # openai models: gpt-4o-mini-tts, gpt-4o-audio-preview
+        model: "eleven_turbo_v2_5" # Only used for openai and elevenlabs
+      llm:  # Used to generate the text of the message
+        provider: "openai" # openai, anthropic, ollama, tabby (default)
+        # openai models: gpt-4o-mini, gpt-5
+        # anthropic models: claude-3-5-haiku-latest
+        # ollama models: gpt-oss:20b
+        model: "gpt-4o-mini" # Only used for openai, anthropic, ollama
+        base_url: # Only used for openai, anthropic, ollama, leave blank if unused
+      message_pattern: "completion_message.j2" # Used to generate the text of the message
+      user_name: "Saito" # Used to personalize the message
 
 # Notification Hook - Runs when Claude sends notifications
 notification:
@@ -109,4 +132,4 @@ global:
   # Performance
   subprocess_timeout: 10 # Timeout for subprocess calls (seconds)
   # Debug
-  verbose_errors: false # Show detailed error messages
+  verbose_errors: true # Show detailed error messages
