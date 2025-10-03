@@ -27,14 +27,16 @@ from pyprojroot import here
 from jinja2 import Environment, FileSystemLoader, TemplateNotFound
 
 
-def _load_and_render_pattern(pattern_name: str, user_name: Optional[str] = None) -> str:
+def _load_and_render_pattern(
+    pattern_name: str, user_name: Optional[str] = None, choose_random: bool = False
+) -> str:
     """
     Load a Jinja2 pattern template and render it with provided variables.
 
     Args:
         pattern_name: Name of the pattern file (e.g., "completion_message.j2")
         user_name: Optional user name for personalization
-
+        choose_random: Whether to choose a random message from the pattern
     Returns:
         Rendered pattern text ready to be sent to LLM
 
@@ -52,6 +54,10 @@ def _load_and_render_pattern(pattern_name: str, user_name: Optional[str] = None)
         raise FileNotFoundError(
             f"Pattern file not found: {patterns_dir / pattern_name}"
         )
+
+    if choose_random:
+        randomized_template = template.render()
+        template = env.from_string(randomized_template)
 
     # Render template with variables
     rendered = template.render(user_name=user_name)
@@ -183,6 +189,7 @@ def announce_tts(
     tts: Optional[Dict[str, Any]] = None,
     llm: Optional[Dict[str, Any]] = None,
     message_pattern: str = "completion_message.j2",
+    choose_random: Optional[bool] = False,
     user_name: Optional[str] = None,
     **kwargs,
 ) -> None:
@@ -200,6 +207,7 @@ def announce_tts(
         tts: TTS configuration dict with keys: provider, voice, model
         llm: LLM configuration dict with keys: provider, model, base_url
         message_pattern: Name of Jinja2 pattern file
+        choose_random: Whether to choose a random message from the pattern
         user_name: User's name for personalization
         **kwargs: Additional configuration parameters (unused)
     """
@@ -209,42 +217,49 @@ def announce_tts(
         verbose_errors = global_config.get("verbose_errors", False)
 
         # Validate required configurations
-        if not tts or not llm:
+        if not tts:
             if verbose_errors:
                 print(
-                    "TTS notification error: missing tts or llm configuration",
+                    "TTS notification error: missing tts configuration",
                     file=sys.stderr,
                 )
             return
 
         # Step 1: Load and render the pattern template
         try:
-            pattern_prompt = _load_and_render_pattern(message_pattern, user_name)
+            pattern_prompt = _load_and_render_pattern(
+                message_pattern, user_name, choose_random
+            )
         except FileNotFoundError as e:
             if verbose_errors:
                 print(f"TTS notification error: {e}", file=sys.stderr)
             return
 
-        # Step 2: Call LLM CLI to generate the message
-        llm_provider = llm.get("provider", "tabby")
-        llm_model = llm.get("model")
-        llm_base_url = llm.get("base_url")
+        # Step 2: Generate message (use LLM if configured, otherwise use pattern directly)
+        if llm:
+            # Call LLM CLI to generate the message
+            llm_provider = llm.get("provider", "tabby")
+            llm_model = llm.get("model")
+            llm_base_url = llm.get("base_url")
 
-        generated_message = _call_llm_cli(
-            provider=llm_provider,
-            model=llm_model,
-            prompt=pattern_prompt,
-            base_url=llm_base_url,
-            timeout=timeout,
-        )
+            generated_message = _call_llm_cli(
+                provider=llm_provider,
+                model=llm_model,
+                prompt=pattern_prompt,
+                base_url=llm_base_url,
+                timeout=timeout,
+            )
 
-        if not generated_message:
-            if verbose_errors:
-                print(
-                    "TTS notification error: LLM CLI failed to generate message",
-                    file=sys.stderr,
-                )
-            return
+            if not generated_message:
+                if verbose_errors:
+                    print(
+                        "TTS notification error: LLM CLI failed to generate message",
+                        file=sys.stderr,
+                    )
+                return
+        else:
+            # No LLM configured, use the rendered pattern directly
+            generated_message = pattern_prompt
 
         # Step 3: Call TTS CLI to play the message
         tts_provider = tts.get("provider", "pyttsx3")
