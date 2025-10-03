@@ -24,7 +24,10 @@ import asyncio
 from llm.llm import prompt_llm
 
 
-app = typer.Typer()
+app = typer.Typer(
+    help="Prompt an LLM provider with a unified interface.",
+    add_completion=False,
+)
 
 
 @app.command()
@@ -40,11 +43,18 @@ def main(
         Optional[str], typer.Option(help="Optional: Base URL for the API.")
     ] = None,
     api_key: Annotated[Optional[str], typer.Option(help="Optional: API key.")] = None,
+    verbose: Annotated[
+        bool,
+        typer.Option(
+            "--verbose", "-v", help="Enable verbose output with status messages"
+        ),
+    ] = False,
 ):
     """
     Prompt an LLM provider with a unified interface.
     """
-    print(f"▶️  Sending prompt to {provider.upper()} model '{model}'...")
+    if verbose:
+        print(f"▶️  Sending prompt to {provider.upper()} model '{model}'...")
 
     # Call your main logic function
     response = asyncio.run(
@@ -58,11 +68,17 @@ def main(
     )
 
     if response:
-        print("\n✅ Response:\n---")
+        if verbose:
+            print("\n✅ Response:\n---")
         print(response)
-        print("---")
+        if verbose:
+            print("---")
     else:
-        print("\n❌ Error: Failed to get a response.")
+        if verbose:
+            print("\n❌ Error: Failed to get a response.")
+        else:
+            # Exit with error code in non-verbose mode
+            raise typer.Exit(code=1)
 
 
 # This makes the script runnable
