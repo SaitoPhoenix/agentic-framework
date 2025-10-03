@@ -9,6 +9,7 @@
 #     "pydantic",
 #     "pydantic-settings",
 #     "typer",
+#     "jinja2",
 # ]
 # ///
 
