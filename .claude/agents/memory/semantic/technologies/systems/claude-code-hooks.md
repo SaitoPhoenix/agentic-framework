@@ -5,7 +5,7 @@ aliases:
   - Claude Code hooks
   - hook system
 entity_classification: technology/system
-status: review-needed
+status: active
 created: 2025-10-04T21:14:00Z
 last_updated: 2025-10-04T21:14:00Z
 source_episodes:
