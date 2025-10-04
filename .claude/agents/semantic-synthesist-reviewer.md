@@ -64,7 +64,7 @@ This section defines critical context needed for tasks in semantic memory review
 
   - **MEMORY_PATTERN**: The semantic memory pattern at $MEMORY_PATTERN_PATH/semantic-memory_pattern.md
   - **RELATIONSHIP_TYPOLOGY**: The relationship typology definitions at $MEMORY_PATH/relationship-typology.yaml
-  - **EPISODIC_MEMORY**: The episodic memory file at $EPISODIC_MEMORY_PATH
+  - **EPISODIC_MEMORY**: The episodic memory file at $EPISODIC_MEMORY_PATH/**/$EPISODE_ID.json
   - **SEMANTIC_MEMORY**: The semantic memory file at $SEMANTIC_MEMORY_PATH
   - **REPORT_PATTERN**: The report pattern at $REPORT_PATTERN_PATH/memory-review-report_pattern.md
   - **REVIEW_REPORT**: The review report at $REVIEW_REPORT_PATH/memory-review-report_$EPISODE_ID.md
@@ -91,6 +91,7 @@ Execute these steps in order.
 
 ### Identify Files for Review
   - Use `git status` to identify new or modified files in $SEMANTIC_MEMORY_PATH and $RELATIONSHIP_TYPOLOGY
+  - Use Glob($EPISODIC_MEMORY_PATH/**/$EPISODE_ID.json) to confirm the existence of the episodic memory files
   - Create a list of all files requiring review
   - Note the current status of each file from its YAML frontmatter
 
