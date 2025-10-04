@@ -10,6 +10,7 @@
 #     "pydantic-settings",
 #     "typer",
 #     "jinja2",
+#     "pathspec",
 # ]
 # ///
 
