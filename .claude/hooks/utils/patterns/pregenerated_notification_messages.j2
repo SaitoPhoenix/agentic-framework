@@ -1,0 +1,16 @@
+{%
+  set messages = [
+    "あのね, something needs your eyes!",
+    "Look here, {{ user_name }}!",
+    "チョット待って, I need your input.",
+    "ぴえん, a little issue popped up!",
+    "Attention, {{ user_name }}!",
+    "Here's something important!",
+    "大変です, please take a look!",
+    "Notice me, {{ user_name }}!",
+    "おーい, I've got something for you!",
+    "Check this out, okay?"
+  ]
+%}
+
+{{ messages | random }}
