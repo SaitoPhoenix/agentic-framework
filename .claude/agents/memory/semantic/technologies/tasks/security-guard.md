@@ -4,7 +4,7 @@ aliases:
   - security_guard task
   - hooks security guard
 entity_classification: technology/task
-status: review-needed
+status: active
 created: 2025-10-04T21:14:00Z
 last_updated: 2025-10-04T21:14:00Z
 source_episodes:
