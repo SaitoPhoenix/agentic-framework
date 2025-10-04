@@ -1,0 +1,155 @@
+# Security Rules Configuration
+# This file defines security rules for preventing accidental exposure of sensitive
+# files and execution of dangerous commands.
+#
+# Structure:
+#   whitelist/blacklist:
+#     permission_level (allow/ask/deny):
+#       files/commands:
+#         - pattern/command with optional attributes
+#
+# Whitelist rules are processed FIRST and have highest precedence.
+# If whitelist matches, blacklist is ignored.
+# Within each list, most restrictive permission wins (deny > ask > allow).
+
+# ============================================================================
+# WHITELIST RULES (Processed first, highest precedence)
+# ============================================================================
+whitelist:
+  allow:
+    files:
+      # Template and example files are safe
+      - pattern: ".env.example"
+        message: "Template files are safe to access"
+
+      - pattern: ".env.sample"
+
+      - pattern: ".env.template"
+
+    commands:
+      - command: "echo"
+        message: "Testing that echo command is whitelisted"
+  # ask:
+  #   files: []
+  #   commands: []
+
+  # deny:
+  #   files: []
+  #   commands: []
+
+# ============================================================================
+# BLACKLIST RULES (Processed after whitelist)
+# ============================================================================
+blacklist:
+  deny:
+    files:
+      # Environment and secrets files
+      - pattern: ".env"
+        message: "Access to .env files containing secrets is prohibited. Use .env.example for templates."
+
+      - pattern: "**/.env"
+        message: "Access to .env files is blocked"
+
+      # AWS credentials
+      - pattern: "**/.aws/credentials"
+        message: "AWS credentials access is blocked"
+
+      - pattern: "**/.aws/config"
+        message: "AWS config access is blocked"
+
+      # SSH private keys
+      - pattern: "**/.ssh/id_*"
+        message: "SSH private key access is blocked"
+
+      - pattern: "**/.ssh/*_rsa"
+        message: "SSH RSA key access is blocked"
+
+      # Certificate files
+      - pattern: "*.pem"
+        message: "PEM certificate file access is blocked"
+
+      - pattern: "*.key"
+        message: "Private key file access is blocked"
+
+      # Generic credentials
+      - pattern: "credentials.json"
+        message: "Credentials file access is blocked"
+
+      - pattern: "secrets.yaml"
+        message: "Secrets file access is blocked"
+
+      - pattern: "secrets.json"
+        message: "Secrets file access is blocked"
+
+    commands:
+      # Dangerous rm commands
+      - command: "rm"
+        flags:
+          - ["-rf"]
+          - ["-fr"]
+          - ["-Rf"]
+          - ["-fR"]
+        paths: ["/", "/*", "~", "~/", "$HOME", "..", ".", "*"]
+        message: "Dangerous rm command with recursive force flags prevented for safety"
+
+      - command: "rm"
+        flags:
+          - ["--recursive", "--force"]
+          - ["--force", "--recursive"]
+        paths: ["/", "/*", "~", "~/", "$HOME", "..", ".", "*"]
+        message: "Dangerous rm command prevented for safety"
+
+      # Sudo/su commands
+      - command: "sudo"
+        block_always: true
+        message: "sudo commands are not allowed for security"
+
+      - command: "su"
+        block_always: true
+        message: "su commands are not allowed for security"
+
+      - command: "echo"
+        block_always: true
+        message: "Testing that echo command is blocked"
+
+  ask:
+    files:
+      # API keys and tokens (ask before accessing)
+      - pattern: "**/*_api_key*"
+        message: "API key file detected. Proceed with caution?"
+
+      - pattern: "**/*token*"
+        message: "Token file detected. Are you sure?"
+
+    commands:
+      # Potentially risky chmod
+      - command: "chmod"
+        flags:
+          - ["777"]
+        message: "chmod 777 makes files world-writable. Continue?"
+
+      - command: "chmod"
+        flags:
+          - ["+x"]
+        message: "Making file executable. Continue?"
+        tools: ["Bash"]  # Only ask for bash, allow for other tools
+
+      # Piping to shell
+      - command: "curl"
+        patterns: ["\\|\\s*sh", "\\|\\s*bash"]
+        message: "Piping curl to shell can be dangerous. Proceed?"
+
+      - command: "wget"
+        patterns: ["\\|\\s*sh", "\\|\\s*bash"]
+        message: "Piping wget to shell can be dangerous. Proceed?"
+
+      # Force push
+      - command: "git push"
+        flags:
+          - ["--force"]
+          - ["-f"]
+        message: "Force push detected. This will overwrite remote history. Continue?"
+
+  # allow:
+  #   files: []
+  #   commands: []

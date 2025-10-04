@@ -5,7 +5,7 @@
 # Quick Reference:
 # - Available hooks: stop, notification, subagent_stop, user_prompt_submit,
 #   pre_tool_use, post_tool_use, pre_compact, session_start, session_end
-# - Available tasks: log_hook, tts_notification, conversation_capture, cleanup_subprocesses
+# - Available tasks: log_hook, tts_notification, conversation_capture, cleanup_subprocesses, security_guard
 # - Docs: https://docs.claude.com/en/docs/claude-code/hooks
 
 # ============================================================================
@@ -41,6 +41,18 @@ notification:
     function: "log_hook_data"
     config:
       hook_name: "notification"
+  tts_notification:
+    enabled: true
+    module: "tts_notification.main"
+    function: "announce_tts"
+    config:
+      tts:
+        provider: "elevenlabs"
+        voice: "fUjY9K2nAIwlALOwSiwc"
+        model: "eleven_turbo_v2_5"
+      message_pattern: "pregenerated_notification_messages.j2"
+      choose_random: true
+      user_name: "Saito"      
 
 # SubagentStop Hook - Runs when subagent tasks complete
 subagent_stop:
@@ -62,6 +74,13 @@ user_prompt_submit:
 
 # PreToolUse Hook - Runs before tool calls
 pre_tool_use:
+  security_guard:
+    enabled: true
+    module: "security_guard.main"
+    function: "check_security"
+    config:
+      rules_file: ".claude/hooks/config/security-rules.yaml"
+      validate_only: false
   log_hook:
     enabled: true
     module: "log_hook.main"
@@ -89,6 +108,13 @@ pre_compact:
 
 # SessionStart Hook - Runs when session starts/resumes
 session_start:
+  security_guard_validator:
+    enabled: false
+    module: "security_guard.main"
+    function: "check_security"
+    config:
+      rules_file: ".claude/hooks/config/security-rules.yaml"
+      validate_only: true
   log_hook:
     enabled: true
     module: "log_hook.main"

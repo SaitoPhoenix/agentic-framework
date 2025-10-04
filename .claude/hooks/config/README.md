@@ -199,6 +199,127 @@ agent_name: (string, required)
 
 ---
 
+### 5. security_guard
+
+**Purpose:** Prevents accidental exposure of sensitive files and execution of dangerous commands
+
+**Module:** `security_guard.main`
+**Function:** `check_security`
+
+**Use Cases:**
+- Blocking access to `.env` files and other sensitive data
+- Preventing dangerous bash commands (rm -rf, sudo, etc.)
+- Enforcing security policies through configurable rules
+- Validating security rules on session start
+
+**Output:** Returns permission decision (allow/ask/deny) via `hookSpecificOutput`
+
+**Error Handling:** Fails safely (allows on error) unless `verbose_errors` is true
+
+**Config:**
+
+```yaml
+rules_file: (string, required)
+  # Path to security-rules.yaml (relative to project root)
+  # Default: ".claude/hooks/config/security-rules.yaml"
+  # Contains whitelist/blacklist rules for files and commands
+
+validate_only: (boolean, optional)
+  # If true, only validate rules and exit (for session_start)
+  # If false, perform security checks (for pre_tool_use)
+  # Default: false
+```
+
+**Security Rules Structure:**
+
+The `security-rules.yaml` file defines rules in a whitelist/blacklist hierarchy:
+
+```yaml
+# Whitelist (processed first, highest precedence)
+whitelist:
+  allow/ask/deny:
+    files:
+      - pattern: (string, required) # Gitignore-style pattern
+        message: (string, optional) # Custom message
+        tools: (list, optional)     # Specific tools [Read, Write, Edit, MultiEdit, Bash]
+
+    commands:
+      - command: (string, required)      # Base command (e.g., "rm", "sudo")
+        block_always: (boolean, optional) # Block regardless of flags/paths/patterns
+        flags: (list, optional)           # List of flag combinations [["-rf"], ["--force"]]
+        paths: (list, optional)           # Literal path arguments ["/", "~", ".", "*"]
+        patterns: (list, optional)        # Regex patterns ["\\s\\./", "\\|\\s*sh"]
+        message: (string, optional)       # Custom message
+        tools: (list, optional)           # Specific tools (default: all tools)
+
+# Notes:
+# - paths: Matched as exact literal arguments (e.g., "/" matches "rm -rf /" only)
+# - patterns: Matched as regex against full command (for advanced matching)
+# - Multiple conditions use AND logic (all must match)
+
+# Blacklist (processed after whitelist)
+blacklist:
+  allow/ask/deny:
+    # Same structure as whitelist
+```
+
+**File Pattern Examples:**
+- `.env` - Blocks .env in current directory
+- `**/.env` - Blocks .env anywhere in tree
+- `*.pem` - Blocks all PEM files
+- `.env.example` - Whitelist allows template files
+
+**Command Rule Matching Logic:**
+
+Commands are matched using **AND logic** when multiple conditions are specified:
+
+1. **Base command** must match (e.g., "rm", "sudo")
+2. **All specified conditions** must match:
+   - If `block_always: true` → Always match
+   - If `flags` specified → Command must have those flags
+   - If `paths` specified → Command must have those **exact literal paths** as arguments
+   - If `patterns` specified → Command must match those **regex patterns**
+   - If `flags` AND `paths` both specified → Command must have BOTH
+
+**Path Matching:**
+- Paths are matched as **literal arguments only**
+- `/` matches `rm -rf /` but NOT `rm -rf a/b` (no substring matching)
+- Use `patterns` for advanced matching like `["\\./.*"]` to match any `./` path
+
+**Command Rule Examples:**
+- `command: "sudo"` with `block_always: true`
+  - Matches: `sudo apt install`, `sudo rm`
+  - Does NOT match: `rm`, `curl`
+
+- `command: "rm"` with `flags: [["-rf"]]` and `paths: ["/", "~", ".", "*"]`
+  - Matches: `rm -rf /`, `rm -rf .`, `rm -rf *` (exact literal argument match)
+  - Does NOT match: `rm -rf a/b`, `rm -rf ./file`, `rm -rf a/*` (not exact matches)
+
+- `command: "rm"` with `flags: [["-rf"]]` and `patterns: ["\\s\\./"]`
+  - Matches: `rm -rf ./anything`, `rm -rf ././c` (regex pattern match)
+  - Does NOT match: `rm -rf /path`, `rm -rf a/b`
+
+- `command: "curl"` with `patterns: ["\\|\\s*sh"]`
+  - Matches: `curl url | sh`, `curl url | bash`
+  - Does NOT match: `curl url > file`
+
+- `command: "echo"` with no conditions
+  - Matches: Any echo command
+
+**Permission Levels:**
+- `deny` - Block the action completely (exit code 2)
+- `ask` - Prompt user for confirmation (exit code 1)
+- `allow` - Allow but log the action (exit code 0)
+
+**Rule Precedence:**
+1. Whitelist rules (highest priority)
+2. Blacklist rules
+3. Within each list: deny > ask > allow (most restrictive wins)
+4. If whitelist matches, blacklist is ignored
+5. If no rules match, allow by default
+
+---
+
 ## Usage Examples
 
 ### Example 1: Simple TTS notification without LLM
@@ -264,7 +385,37 @@ session_start:
       agent_name: "Claude"
 ```
 
-### Example 4: Disable a task
+### Example 4: Security guard for pre_tool_use
+
+Prevent accidental exposure of sensitive files and dangerous commands.
+
+```yaml
+pre_tool_use:
+  security_guard:
+    enabled: true
+    module: "security_guard.main"
+    function: "check_security"
+    config:
+      rules_file: ".claude/hooks/config/security-rules.yaml"
+      validate_only: false
+```
+
+### Example 5: Security rules validation on session start
+
+Validate security rules when session starts to catch configuration errors early.
+
+```yaml
+session_start:
+  security_guard_validator:
+    enabled: true
+    module: "security_guard.main"
+    function: "check_security"
+    config:
+      rules_file: ".claude/hooks/config/security-rules.yaml"
+      validate_only: true
+```
+
+### Example 6: Disable a task
 
 Set `enabled: false` to disable a task without removing its configuration.
 
@@ -352,6 +503,50 @@ stop:
 - Check PID files in `.claude/hooks/pid/{session_id}/`
 - May need to manually kill processes if session crashes: `ps aux | grep conversation_watchdog`
 - Remove stale PID files: `rm -rf .claude/hooks/pid/{session_id}/`
+
+---
+
+### Security rules validation failed
+
+**Symptoms:** Error message on session start about invalid security rules
+
+**Solutions:**
+- Check the error message for specific validation issues
+- Verify YAML syntax in `.claude/hooks/config/security-rules.yaml`
+- Ensure all required fields are present:
+  - File rules need `pattern`
+  - Command rules need `command`
+- Check that permission levels are valid: `allow`, `ask`, or `deny`
+- Verify tool names are valid: `Read`, `Write`, `Edit`, `MultiEdit`, `Bash`
+- Test YAML parsing: `python -c "import yaml; yaml.safe_load(open('.claude/hooks/config/security-rules.yaml'))"`
+
+---
+
+### Security guard blocking legitimate operations
+
+**Symptoms:** Tool calls are blocked unexpectedly
+
+**Solutions:**
+- Check which rule is matching in the error message
+- Add whitelist rules to override blacklist for specific cases
+- Use `ask` permission instead of `deny` for questionable operations
+- Adjust file patterns to be more specific (e.g., `.env` vs `**/.env`)
+- Set `verbose_errors: true` to see detailed matching information
+- Temporarily disable: set `security_guard.enabled: false` in hooks_config.yaml
+
+---
+
+### Security guard not blocking dangerous operations
+
+**Symptoms:** Expected dangerous commands/files are not blocked
+
+**Solutions:**
+- Verify `security_guard` is enabled on `pre_tool_use` hook
+- Check that rules file path is correct in config
+- Ensure rule patterns match the actual file paths/commands
+- Test patterns manually with `pathspec` library
+- Enable logging to see what rules are being checked
+- Verify permission level is `deny` or `ask`, not `allow`
 
 ---
 
