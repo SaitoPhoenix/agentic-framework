@@ -179,7 +179,7 @@ temp/
 .claude/agent-docs/memory/episodic/*
 .claude/hooks/pid/*
 .mcp.json
-.claude/commands/temp.md
+.claude/commands/test/
 .claude/hooks/test/reports/
 #CLAUDE.md
 
