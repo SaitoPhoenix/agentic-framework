@@ -96,8 +96,8 @@ Execute these steps in order.
   - Note the current status of each file from its YAML frontmatter
 
 ### Create Initial Commit
-  - Create a single git commit for all new or updated memory files.
-  - List the files in the commit message.
+  - Create a **SINGLE** commit for that includes all new or updated memory files
+  - List the files in the commit message
   - New files should have the status set to "new"
   - Updated files should have the status set to "updated"
   - The commit message should indicate that new memories have been created or updated and now require review
@@ -134,7 +134,7 @@ Execute these steps in order.
     - Document specific issues for the report
 
 ### Commit Status Changes
-  - After reviewing and updating status for each file, create a single commit
+  - Create a **SINGLE** commit that includes all files with status changes
   - List the files in the commit message
   - Identify the new status of each file
   - If the status is "review-needed", document the specific issues
