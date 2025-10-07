@@ -176,7 +176,7 @@ temp/
 #.claude/
 .claude/data/
 .claude-trace/
-.claude/agents/memory/episodic/*
+.claude/agent-docs/memory/episodic/*
 .claude/hooks/pid/*
 .mcp.json
 .claude/commands/temp.md
