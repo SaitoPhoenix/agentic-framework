@@ -26,9 +26,6 @@ whitelist:
 
       - pattern: ".env.template"
 
-    commands:
-      - command: "echo"
-        message: "Testing that echo command is whitelisted"
   # ask:
   #   files: []
   #   commands: []
@@ -107,10 +104,6 @@ blacklist:
       - command: "su"
         block_always: true
         message: "su commands are not allowed for security"
-
-      - command: "echo"
-        block_always: true
-        message: "Testing that echo command is blocked"
 
   ask:
     files:
