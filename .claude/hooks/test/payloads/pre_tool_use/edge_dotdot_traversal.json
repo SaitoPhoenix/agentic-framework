@@ -1,0 +1,34 @@
+{
+  "metadata": {
+    "test_id": "edge_dotdot_traversal",
+    "hook_type": "PreToolUse",
+    "category": "edge_cases",
+    "description": "Edge reading ../../.env",
+    "tags": [
+      "edge-case"
+    ],
+    "priority": "critical",
+    "expected": {
+      "output_type": "json",
+      "json_output": {
+        "hookSpecificOutput.permissionDecision": "deny",
+        "hookSpecificOutput.permissionDecisionReason": {
+          "regex": "Access to \\.env files.*prohibited"
+        }
+      }
+    },
+    "migrated_from": ".claude/hooks/tasks/security_guard/test_payloads/edge_dotdot_traversal.json",
+    "created": "2025-10-07"
+  },
+  "payload": {
+    "session_id": "0b81a678-f45d-4363-8579-540ac8eef287",
+    "transcript_path": "/home/papa/.claude/projects/-mnt-e-DataAlchemy-Repositories-agentic-framework/0b81a678-f45d-4363-8579-540ac8eef287.jsonl",
+    "cwd": "/mnt/e/DataAlchemy/Repositories/agentic-framework",
+    "permission_mode": "acceptEdits",
+    "hook_event_name": "PreToolUse",
+    "tool_name": "Read",
+    "tool_input": {
+      "file_path": "../../.env"
+    }
+  }
+}

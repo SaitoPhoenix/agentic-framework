@@ -1,0 +1,126 @@
+# Universal Hook Test Runner Configuration
+version: "1.0"
+name: "Claude Code Hook Test Suite"
+
+# Test Runner Settings
+# All paths are relative to project root (determined by pyprojroot.here())
+runner:
+  hook_entry_script: ".claude/hooks/hook_entry.py"
+  payloads_base_dir: ".claude/hooks/test/payloads"
+  reports_output_dir: ".claude/hooks/test/reports"
+  baseline_file: ".claude/hooks/test/reports/baseline.json"
+  parallel_execution: true
+  max_workers: 10
+  timeout_seconds: 5
+  verbose: false
+
+# Hook Type to CLI Argument Mapping
+hooks:
+  PreToolUse:
+    cli_arg: "pre_tool_use"
+    payload_dir: "pre_tool_use"
+    expected_output_type: "json"
+
+  PostToolUse:
+    cli_arg: "post_tool_use"
+    payload_dir: "post_tool_use"
+    expected_output_type: "json"
+
+  UserPromptSubmit:
+    cli_arg: "user_prompt_submit"
+    payload_dir: "user_prompt_submit"
+    expected_output_type: "json"
+
+  Notification:
+    cli_arg: "notification"
+    payload_dir: "notification"
+    expected_output_type: "exitcode"
+
+  Stop:
+    cli_arg: "stop"
+    payload_dir: "stop"
+    expected_output_type: "json"
+
+  SubagentStop:
+    cli_arg: "subagent_stop"
+    payload_dir: "subagent_stop"
+    expected_output_type: "json"
+
+  PreCompact:
+    cli_arg: "pre_compact"
+    payload_dir: "pre_compact"
+    expected_output_type: "exitcode"
+
+  SessionStart:
+    cli_arg: "session_start"
+    payload_dir: "session_start"
+    expected_output_type: "json"
+
+  SessionEnd:
+    cli_arg: "session_end"
+    payload_dir: "session_end"
+    expected_output_type: "exitcode"
+
+# Universal Test Categories
+categories:
+  security_deny:
+    name: "Security - Deny"
+    description: "Tests for denied operations due to security rules"
+    priority: critical
+
+  security_ask:
+    name: "Security - Ask"
+    description: "Tests for operations requiring user confirmation"
+    priority: high
+
+  security_allow:
+    name: "Security - Allow"
+    description: "Tests for explicitly allowed operations"
+    priority: high
+
+  validation:
+    name: "Validation"
+    description: "Tests for validation checks"
+    priority: medium
+
+  notification:
+    name: "Notifications"
+    description: "Tests for notification delivery"
+    priority: low
+
+  transformation:
+    name: "Transformations"
+    description: "Tests for data transformation hooks"
+    priority: medium
+
+  edge_cases:
+    name: "Edge Cases"
+    description: "Edge case and bypass testing"
+    priority: critical
+
+  future:
+    name: "Future Features"
+    description: "Tests for features not yet implemented"
+    priority: low
+    expected_to_fail: true
+
+# Test Filtering
+filters:
+  exclude_tags: ["wip", "disabled"]
+  include_priorities: ["critical", "high", "medium", "low"]
+  skip_known_issues: false
+
+# Reporting
+reporting:
+  formats:
+    - json
+    - markdown
+  save_history: true
+  max_history_entries: 50
+
+# CI/CD Integration
+ci:
+  fail_on_regression: true
+  fail_on_critical_failure: true
+  fail_on_high_priority_failure: true
+  github_annotations: true

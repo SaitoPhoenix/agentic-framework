@@ -1,0 +1,36 @@
+{
+  "metadata": {
+    "test_id": "deny_rm_force_recursive",
+    "hook_type": "PreToolUse",
+    "category": "security_deny",
+    "description": "Deny: rm --force --recursive .",
+    "tags": [
+      "security",
+      "rm"
+    ],
+    "priority": "critical",
+    "expected": {
+      "output_type": "json",
+      "json_output": {
+        "hookSpecificOutput.permissionDecision": "deny",
+        "hookSpecificOutput.permissionDecisionReason": {
+          "regex": "Dangerous rm command.*prevented for safety"
+        }
+      }
+    },
+    "migrated_from": ".claude/hooks/tasks/security_guard/test_payloads/deny_rm_force_recursive.json",
+    "created": "2025-10-07"
+  },
+  "payload": {
+    "session_id": "0b81a678-f45d-4363-8579-540ac8eef287",
+    "transcript_path": "/home/papa/.claude/projects/-mnt-e-DataAlchemy-Repositories-agentic-framework/0b81a678-f45d-4363-8579-540ac8eef287.jsonl",
+    "cwd": "/mnt/e/DataAlchemy/Repositories/agentic-framework",
+    "permission_mode": "acceptEdits",
+    "hook_event_name": "PreToolUse",
+    "tool_name": "Bash",
+    "tool_input": {
+      "command": "rm --force --recursive .",
+      "description": "Delete current directory with long flags"
+    }
+  }
+}

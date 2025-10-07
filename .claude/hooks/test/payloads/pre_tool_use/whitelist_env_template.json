@@ -1,0 +1,34 @@
+{
+  "metadata": {
+    "test_id": "whitelist_env_template",
+    "hook_type": "PreToolUse",
+    "category": "security_allow",
+    "description": "Whitelist reading /mnt/e/DataAlchemy/Repositories/agentic-framework/.env.template",
+    "tags": [
+      "env"
+    ],
+    "priority": "high",
+    "expected": {
+      "output_type": "json",
+      "json_output": {
+        "hookSpecificOutput.permissionDecision": "allow",
+        "hookSpecificOutput.permissionDecisionReason": {
+          "regex": "Sensitive file access prevented for safety: \\.env\\.template"
+        }
+      }
+    },
+    "migrated_from": ".claude/hooks/tasks/security_guard/test_payloads/whitelist_env_template.json",
+    "created": "2025-10-07"
+  },
+  "payload": {
+    "session_id": "0b81a678-f45d-4363-8579-540ac8eef287",
+    "transcript_path": "/home/papa/.claude/projects/-mnt-e-DataAlchemy-Repositories-agentic-framework/0b81a678-f45d-4363-8579-540ac8eef287.jsonl",
+    "cwd": "/mnt/e/DataAlchemy/Repositories/agentic-framework",
+    "permission_mode": "acceptEdits",
+    "hook_event_name": "PreToolUse",
+    "tool_name": "Read",
+    "tool_input": {
+      "file_path": "/mnt/e/DataAlchemy/Repositories/agentic-framework/.env.template"
+    }
+  }
+}

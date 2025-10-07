@@ -1,0 +1,93 @@
+{
+  "run_metadata": {
+    "timestamp": "2025-10-07T09:48:26.367598",
+    "total_tests": 6,
+    "duration_seconds": 0.8492649999999999
+  },
+  "summary": {
+    "passed": 6,
+    "failed": 0,
+    "errors": 0,
+    "pass_rate": 100.0
+  },
+  "by_category": {
+    "security_ask": {
+      "passed": 1,
+      "failed": 0,
+      "errors": 0
+    },
+    "security_allow": {
+      "passed": 1,
+      "failed": 0,
+      "errors": 0
+    },
+    "uncategorized": {
+      "passed": 3,
+      "failed": 0,
+      "errors": 0
+    },
+    "security_deny": {
+      "passed": 1,
+      "failed": 0,
+      "errors": 0
+    }
+  },
+  "by_hook_type": {
+    "PreToolUse": {
+      "passed": 6,
+      "failed": 0,
+      "errors": 0
+    }
+  },
+  "failures": [],
+  "all_results": [
+    {
+      "test_id": "example_contains_match",
+      "hook_type": "PreToolUse",
+      "category": "security_ask",
+      "priority": "high",
+      "result": "pass",
+      "execution_time_ms": 137.725
+    },
+    {
+      "test_id": "example_exact_match",
+      "hook_type": "PreToolUse",
+      "category": "security_allow",
+      "priority": "medium",
+      "result": "pass",
+      "execution_time_ms": 138.025
+    },
+    {
+      "test_id": "whitelist_echo_command",
+      "hook_type": "PreToolUse",
+      "category": "uncategorized",
+      "priority": "medium",
+      "result": "pass",
+      "execution_time_ms": 138.599
+    },
+    {
+      "test_id": "deny_env_file",
+      "hook_type": "PreToolUse",
+      "category": "uncategorized",
+      "priority": "medium",
+      "result": "pass",
+      "execution_time_ms": 139.321
+    },
+    {
+      "test_id": "deny_env_file_with_metadata",
+      "hook_type": "PreToolUse",
+      "category": "security_deny",
+      "priority": "critical",
+      "result": "pass",
+      "execution_time_ms": 138.988
+    },
+    {
+      "test_id": "ask_chmod_777",
+      "hook_type": "PreToolUse",
+      "category": "uncategorized",
+      "priority": "medium",
+      "result": "pass",
+      "execution_time_ms": 156.607
+    }
+  ]
+}

@@ -1,0 +1,348 @@
+{
+  "created": "2025-10-07T10:15:57.495689",
+  "total_tests": 57,
+  "tests": {
+    "ask_curl_pipe_bash": {
+      "result": "pass",
+      "category": "security_ask",
+      "priority": "high",
+      "hook_type": "PreToolUse"
+    },
+    "ask_api_key_file": {
+      "result": "pass",
+      "category": "security_ask",
+      "priority": "high",
+      "hook_type": "PreToolUse"
+    },
+    "ask_git_push_-f": {
+      "result": "pass",
+      "category": "security_ask",
+      "priority": "high",
+      "hook_type": "PreToolUse"
+    },
+    "ask_git_push_force": {
+      "result": "pass",
+      "category": "security_ask",
+      "priority": "high",
+      "hook_type": "PreToolUse"
+    },
+    "ask_chmod_777": {
+      "result": "pass",
+      "category": "security_ask",
+      "priority": "high",
+      "hook_type": "PreToolUse"
+    },
+    "ask_wget_pipe_sh": {
+      "result": "pass",
+      "category": "security_ask",
+      "priority": "high",
+      "hook_type": "PreToolUse"
+    },
+    "ask_chmod_+x": {
+      "result": "pass",
+      "category": "security_ask",
+      "priority": "high",
+      "hook_type": "PreToolUse"
+    },
+    "ask_wget_pipe_bash": {
+      "result": "pass",
+      "category": "security_ask",
+      "priority": "high",
+      "hook_type": "PreToolUse"
+    },
+    "ask_curl_pipe_sh": {
+      "result": "pass",
+      "category": "security_ask",
+      "priority": "high",
+      "hook_type": "PreToolUse"
+    },
+    "ask_token_file": {
+      "result": "pass",
+      "category": "security_ask",
+      "priority": "high",
+      "hook_type": "PreToolUse"
+    },
+    "deny_aws_credentials": {
+      "result": "pass",
+      "category": "security_deny",
+      "priority": "critical",
+      "hook_type": "PreToolUse"
+    },
+    "deny_env_file": {
+      "result": "pass",
+      "category": "security_deny",
+      "priority": "critical",
+      "hook_type": "PreToolUse"
+    },
+    "deny_credentials_json": {
+      "result": "pass",
+      "category": "security_deny",
+      "priority": "critical",
+      "hook_type": "PreToolUse"
+    },
+    "deny_aws_config": {
+      "result": "pass",
+      "category": "security_deny",
+      "priority": "critical",
+      "hook_type": "PreToolUse"
+    },
+    "deny_env_subdirectory": {
+      "result": "pass",
+      "category": "security_deny",
+      "priority": "critical",
+      "hook_type": "PreToolUse"
+    },
+    "deny_key_file": {
+      "result": "pass",
+      "category": "security_deny",
+      "priority": "critical",
+      "hook_type": "PreToolUse"
+    },
+    "deny_rm_-fr_home": {
+      "result": "pass",
+      "category": "security_deny",
+      "priority": "critical",
+      "hook_type": "PreToolUse"
+    },
+    "deny_pem_file": {
+      "result": "pass",
+      "category": "security_deny",
+      "priority": "critical",
+      "hook_type": "PreToolUse"
+    },
+    "deny_rm_-rf_dot": {
+      "result": "pass",
+      "category": "security_deny",
+      "priority": "critical",
+      "hook_type": "PreToolUse"
+    },
+    "deny_rm_-fR_wildcard": {
+      "result": "pass",
+      "category": "security_deny",
+      "priority": "critical",
+      "hook_type": "PreToolUse"
+    },
+    "deny_rm_-rf_slash": {
+      "result": "pass",
+      "category": "security_deny",
+      "priority": "critical",
+      "hook_type": "PreToolUse"
+    },
+    "deny_rm_recursive_force": {
+      "result": "pass",
+      "category": "security_deny",
+      "priority": "critical",
+      "hook_type": "PreToolUse"
+    },
+    "deny_rm_force_recursive": {
+      "result": "pass",
+      "category": "security_deny",
+      "priority": "critical",
+      "hook_type": "PreToolUse"
+    },
+    "deny_rm_-Rf_tilde": {
+      "result": "pass",
+      "category": "security_deny",
+      "priority": "critical",
+      "hook_type": "PreToolUse"
+    },
+    "deny_secrets_json": {
+      "result": "pass",
+      "category": "security_deny",
+      "priority": "critical",
+      "hook_type": "PreToolUse"
+    },
+    "deny_ssh_id_rsa": {
+      "result": "pass",
+      "category": "security_deny",
+      "priority": "critical",
+      "hook_type": "PreToolUse"
+    },
+    "deny_secrets_yaml": {
+      "result": "pass",
+      "category": "security_deny",
+      "priority": "critical",
+      "hook_type": "PreToolUse"
+    },
+    "deny_ssh_id_ed25519": {
+      "result": "pass",
+      "category": "security_deny",
+      "priority": "critical",
+      "hook_type": "PreToolUse"
+    },
+    "deny_su_command": {
+      "result": "pass",
+      "category": "security_deny",
+      "priority": "critical",
+      "hook_type": "PreToolUse"
+    },
+    "deny_sudo_command": {
+      "result": "pass",
+      "category": "security_deny",
+      "priority": "critical",
+      "hook_type": "PreToolUse"
+    },
+    "edge_chained_commands": {
+      "result": "pass",
+      "category": "edge_cases",
+      "priority": "critical",
+      "hook_type": "PreToolUse"
+    },
+    "edge_dotdot_traversal": {
+      "result": "pass",
+      "category": "edge_cases",
+      "priority": "critical",
+      "hook_type": "PreToolUse"
+    },
+    "edge_curl_multiline": {
+      "result": "pass",
+      "category": "edge_cases",
+      "priority": "critical",
+      "hook_type": "PreToolUse"
+    },
+    "edge_file_with_spaces": {
+      "result": "pass",
+      "category": "edge_cases",
+      "priority": "critical",
+      "hook_type": "PreToolUse"
+    },
+    "edge_env_uppercase": {
+      "result": "pass",
+      "category": "edge_cases",
+      "priority": "critical",
+      "hook_type": "PreToolUse"
+    },
+    "edge_relative_path_env": {
+      "result": "pass",
+      "category": "edge_cases",
+      "priority": "critical",
+      "hook_type": "PreToolUse"
+    },
+    "edge_nested_env": {
+      "result": "pass",
+      "category": "edge_cases",
+      "priority": "critical",
+      "hook_type": "PreToolUse"
+    },
+    "edge_rm_env_var": {
+      "result": "pass",
+      "category": "edge_cases",
+      "priority": "critical",
+      "hook_type": "PreToolUse"
+    },
+    "edge_rm_safe_specific": {
+      "result": "pass",
+      "category": "edge_cases",
+      "priority": "critical",
+      "hook_type": "PreToolUse"
+    },
+    "edge_rm_extra_spaces": {
+      "result": "pass",
+      "category": "edge_cases",
+      "priority": "critical",
+      "hook_type": "PreToolUse"
+    },
+    "edge_subshell_rm": {
+      "result": "pass",
+      "category": "edge_cases",
+      "priority": "critical",
+      "hook_type": "PreToolUse"
+    },
+    "future_dd_command": {
+      "result": "pass",
+      "category": "future",
+      "priority": "low",
+      "hook_type": "PreToolUse"
+    },
+    "future_etc_passwd": {
+      "result": "pass",
+      "category": "future",
+      "priority": "low",
+      "hook_type": "PreToolUse"
+    },
+    "edge_secrets_mixed_case": {
+      "result": "pass",
+      "category": "edge_cases",
+      "priority": "critical",
+      "hook_type": "PreToolUse"
+    },
+    "future_docker_config": {
+      "result": "pass",
+      "category": "future",
+      "priority": "low",
+      "hook_type": "PreToolUse"
+    },
+    "future_git_credentials": {
+      "result": "pass",
+      "category": "future",
+      "priority": "low",
+      "hook_type": "PreToolUse"
+    },
+    "future_gpg_key": {
+      "result": "pass",
+      "category": "future",
+      "priority": "low",
+      "hook_type": "PreToolUse"
+    },
+    "future_etc_shadow": {
+      "result": "pass",
+      "category": "future",
+      "priority": "low",
+      "hook_type": "PreToolUse"
+    },
+    "future_kube_config": {
+      "result": "pass",
+      "category": "future",
+      "priority": "low",
+      "hook_type": "PreToolUse"
+    },
+    "future_mkfs_command": {
+      "result": "pass",
+      "category": "future",
+      "priority": "low",
+      "hook_type": "PreToolUse"
+    },
+    "whitelist_env_sample": {
+      "result": "pass",
+      "category": "security_allow",
+      "priority": "high",
+      "hook_type": "PreToolUse"
+    },
+    "whitelist_echo_command": {
+      "result": "pass",
+      "category": "security_allow",
+      "priority": "high",
+      "hook_type": "PreToolUse"
+    },
+    "future_netrc": {
+      "result": "pass",
+      "category": "future",
+      "priority": "low",
+      "hook_type": "PreToolUse"
+    },
+    "future_pgpass": {
+      "result": "pass",
+      "category": "future",
+      "priority": "low",
+      "hook_type": "PreToolUse"
+    },
+    "future_npmrc": {
+      "result": "pass",
+      "category": "future",
+      "priority": "low",
+      "hook_type": "PreToolUse"
+    },
+    "whitelist_env_example": {
+      "result": "pass",
+      "category": "security_allow",
+      "priority": "high",
+      "hook_type": "PreToolUse"
+    },
+    "whitelist_env_template": {
+      "result": "pass",
+      "category": "security_allow",
+      "priority": "high",
+      "hook_type": "PreToolUse"
+    }
+  }
+}
