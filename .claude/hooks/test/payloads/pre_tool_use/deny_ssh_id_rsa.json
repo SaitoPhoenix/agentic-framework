@@ -18,7 +18,6 @@
         }
       }
     },
-    "migrated_from": ".claude/hooks/tasks/security_guard/test_payloads/deny_ssh_id_rsa.json",
     "created": "2025-10-07"
   },
   "payload": {

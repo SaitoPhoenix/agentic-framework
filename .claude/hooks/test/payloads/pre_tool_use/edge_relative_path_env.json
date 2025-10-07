@@ -18,7 +18,6 @@
         }
       }
     },
-    "migrated_from": ".claude/hooks/tasks/security_guard/test_payloads/edge_relative_path_env.json",
     "created": "2025-10-07"
   },
   "payload": {

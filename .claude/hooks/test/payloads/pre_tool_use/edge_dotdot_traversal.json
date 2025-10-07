@@ -5,6 +5,8 @@
     "category": "edge_cases",
     "description": "Edge reading ../../.env",
     "tags": [
+      "security",
+      "env",
       "edge-case"
     ],
     "priority": "critical",
@@ -17,7 +19,6 @@
         }
       }
     },
-    "migrated_from": ".claude/hooks/tasks/security_guard/test_payloads/edge_dotdot_traversal.json",
     "created": "2025-10-07"
   },
   "payload": {

@@ -17,7 +17,6 @@
         }
       }
     },
-    "migrated_from": ".claude/hooks/tasks/security_guard/test_payloads/whitelist_env_example.json",
     "created": "2025-10-07"
   },
   "payload": {

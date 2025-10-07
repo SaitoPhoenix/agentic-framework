@@ -5,14 +5,20 @@
     "category": "edge_cases",
     "description": "Edge reading /mnt/e/DataAlchemy/Repositories/agentic-framework/my secrets.json",
     "tags": [
+      "security",
+      "secrets",
       "edge-case"
     ],
     "priority": "critical",
     "expected": {
-      "output_type": "exitcode",
-      "exit_code": 0
+      "output_type": "json",
+      "json_output": {
+        "hookSpecificOutput.permissionDecision": "deny",
+        "hookSpecificOutput.permissionDecisionReason": {
+          "regex": "Secrets file access is blocked"
+        }
+      }
     },
-    "migrated_from": ".claude/hooks/tasks/security_guard/test_payloads/edge_file_with_spaces.json",
     "created": "2025-10-07"
   },
   "payload": {

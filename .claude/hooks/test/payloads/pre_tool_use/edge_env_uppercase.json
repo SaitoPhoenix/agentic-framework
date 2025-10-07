@@ -5,15 +5,20 @@
     "category": "edge_cases",
     "description": "Edge reading /mnt/e/DataAlchemy/Repositories/agentic-framework/.ENV",
     "tags": [
-      "edge-case",
-      "env"
+      "security",
+      "env",
+      "edge-case"
     ],
     "priority": "critical",
     "expected": {
-      "output_type": "exitcode",
-      "exit_code": 0
+      "output_type": "json",
+      "json_output": {
+        "hookSpecificOutput.permissionDecision": "deny",
+        "hookSpecificOutput.permissionDecisionReason": {
+          "regex": "Access to \\.env files.*prohibited"
+        }
+      }
     },
-    "migrated_from": ".claude/hooks/tasks/security_guard/test_payloads/edge_env_uppercase.json",
     "created": "2025-10-07"
   },
   "payload": {

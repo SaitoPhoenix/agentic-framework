@@ -5,14 +5,19 @@
     "category": "edge_cases",
     "description": "Edge: cd ~ && rm -rf *",
     "tags": [
-      "edge-case"
+      "edge-case",
+      "rm"
     ],
     "priority": "critical",
     "expected": {
-      "output_type": "exitcode",
-      "exit_code": 0
+      "output_type": "json",
+      "json_output": {
+        "hookSpecificOutput.permissionDecision": "deny",
+        "hookSpecificOutput.permissionDecisionReason": {
+          "regex": "Dangerous rm command.*prevented for safety"
+        }
+      }
     },
-    "migrated_from": ".claude/hooks/tasks/security_guard/test_payloads/edge_chained_commands.json",
     "created": "2025-10-07"
   },
   "payload": {

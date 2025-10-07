@@ -12,7 +12,6 @@
       "output_type": "exitcode",
       "exit_code": 0
     },
-    "migrated_from": ".claude/hooks/tasks/security_guard/test_payloads/future_mkfs_command.json",
     "created": "2025-10-07"
   },
   "payload": {

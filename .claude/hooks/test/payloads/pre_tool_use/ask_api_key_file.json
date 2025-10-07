@@ -18,7 +18,6 @@
         }
       }
     },
-    "migrated_from": ".claude/hooks/tasks/security_guard/test_payloads/ask_api_key_file.json",
     "created": "2025-10-07"
   },
   "payload": {

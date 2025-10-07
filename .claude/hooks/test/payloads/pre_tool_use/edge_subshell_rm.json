@@ -3,23 +3,23 @@
     "test_id": "edge_subshell_rm",
     "hook_type": "PreToolUse",
     "category": "edge_cases",
-    "description": "Edge: echo $(rm -rf /tmp)",
+    "description": "Edge: echo $(rm -rf /)",
     "tags": [
       "edge-case",
       "rm",
-      "privilege-escalation"
+      "privilege-escalation",
+      "security"
     ],
     "priority": "critical",
     "expected": {
       "output_type": "json",
       "json_output": {
-        "hookSpecificOutput.permissionDecision": "allow",
+        "hookSpecificOutput.permissionDecision": "deny",
         "hookSpecificOutput.permissionDecisionReason": {
-          "regex": "echo command is whitelisted"
+          "regex": "Dangerous rm command.*prevented for safety"
         }
       }
     },
-    "migrated_from": ".claude/hooks/tasks/security_guard/test_payloads/edge_subshell_rm.json",
     "created": "2025-10-07"
   },
   "payload": {
@@ -30,7 +30,7 @@
     "hook_event_name": "PreToolUse",
     "tool_name": "Bash",
     "tool_input": {
-      "command": "echo $(rm -rf /tmp)",
+      "command": "echo $(rm -rf /)",
       "description": "rm in subshell"
     }
   }
