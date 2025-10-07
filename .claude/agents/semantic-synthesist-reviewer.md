@@ -91,15 +91,17 @@ Execute these steps in order.
 
 ### Identify Files for Review
   - Use `git status` to identify new or modified files in $SEMANTIC_MEMORY_PATH and $RELATIONSHIP_TYPOLOGY
-  - Use Glob($EPISODIC_MEMORY_PATH/**/$EPISODE_ID.json) to confirm the existence of the episodic memory files
+  - Search for $EPISODIC_MEMORY_PATH/**/$EPISODE_ID.json to confirm the existence of the episodic memory files
   - Create a list of all files requiring review
   - Note the current status of each file from its YAML frontmatter
 
 ### Create Initial Commit
-  - For every new or updated file found, create a git commit with message:
-    ```
-    Chore: Stage semantic memory file for review - <filename>
-    ```
+  - Create a single git commit for all new or updated memory files.
+  - List the files in the commit message.
+  - New files should have the status set to "new"
+  - Updated files should have the status set to "updated"
+  - The commit message should indicate that new memories have been created or updated and now require review
+
 ### Individual File Review
   - Read $MEMORY_PATTERN to understand expected structure & content organization of semantic memory files
   - Read $RELATIONSHIP_TYPOLOGY to understand expected relationships between entities
@@ -132,13 +134,10 @@ Execute these steps in order.
     - Document specific issues for the report
 
 ### Commit Status Changes
-  - After reviewing and updating status for each file, create a commit:
-    ```
-    Chore: Update semantic memory status after review - <filename>
-
-    Status changed to: <new_status>
-    <Brief reason if review_needed>
-    ```
+  - After reviewing and updating status for each file, create a single commit
+  - List the files in the commit message
+  - Identify the new status of each file
+  - If the status is "review-needed", document the specific issues
 
 ### Generate Review Report
   - After reviewing and updating status for each file, generate the review report using $REPORT_PATTERN
