@@ -4,11 +4,12 @@ aliases:
   - security_guard task
   - hooks security guard
 entity_classification: technology/task
-status: active
+status: updated
 created: 2025-10-04T21:14:00Z
-last_updated: 2025-10-04T21:14:00Z
+last_updated: 2025-10-06T00:00:00Z
 source_episodes:
   - 251003_EP_7
+  - 251006_EP_2
 summary: A modular task for Claude Code hooks that provides configurable security controls to prevent accidental exposure of sensitive files and execution of dangerous commands
 ambiguities: []
 relationships:
@@ -27,6 +28,11 @@ relationships:
     description: The Architect implemented the security guard task based on Saito's requirements
     role: implementation
     source: 251003_EP_7
+  - type: used_by
+    entity: hook-test-framework
+    description: Security guard is tested by the comprehensive hook test framework
+    role: test subject
+    source: 251006_EP_2
 ---
 
 ## Facts
@@ -58,6 +64,15 @@ relationships:
 - Command paths are matched as literal arguments only [251003_EP_7]
 - Regex patterns can be specified explicitly for advanced matching [251003_EP_7]
 - When multiple conditions exist (flags AND paths), ALL must match [251003_EP_7]
+
+### Test Coverage
+- Comprehensive test suite with 57 test cases [251006_EP_2]
+- Whitelist tests: 4 (validate allowed patterns like .env.example) [251006_EP_2]
+- Deny tests: 20 (validate blocked operations like .env files and rm -rf commands) [251006_EP_2]
+- Ask tests: 10 (validate confirmation prompts for chmod, curl|bash, git push -f) [251006_EP_2]
+- Edge case tests: 12 (uppercase filenames, spaces, path traversal, environment variables) [251006_EP_2]
+- Future enhancement tests: 11 (document potential rules not yet implemented) [251006_EP_2]
+- 100% test pass rate achieved after migration to new test framework [251006_EP_2]
 
 ## Decisions
 
@@ -110,6 +125,11 @@ relationships:
 - Confirmed permission levels work correctly (deny, ask, allow) [251003_EP_7]
 - Fixed command matching logic to use AND for multiple conditions [251003_EP_7]
 - Fixed path matching to only match literal arguments [251003_EP_7]
+- Created 57 comprehensive test payloads covering all security rules [251006_EP_2]
+- Tested all payloads with 100% pass rate [251006_EP_2]
+- Created edge case tests for boundary conditions [251006_EP_2]
+- Created future enhancement tests documenting potential security rules [251006_EP_2]
+- Migrated all tests to new test framework format [251006_EP_2]
 
 ## Approaches
 
@@ -122,3 +142,20 @@ relationships:
 - Test individual components through hook_entry.py with JSON input [251003_EP_7]
 - Use echo command piped to hook_entry.py for testing specific scenarios [251003_EP_7]
 - Iterative testing and fixing based on observed behavior [251003_EP_7]
+- Comprehensive test suite organized by category and priority [251006_EP_2]
+- Automated test migration with validation rules [251006_EP_2]
+- Edge case testing for unusual inputs and boundary conditions [251006_EP_2]
+
+## Suggestions
+
+### Security Enhancements
+- Add patterns for .git-credentials files [251006_EP_2]
+- Add patterns for .npmrc files with auth tokens [251006_EP_2]
+- Add patterns for .netrc files [251006_EP_2]
+- Add patterns for .pgpass PostgreSQL password files [251006_EP_2]
+- Add patterns for Docker credential files (~/.docker/config.json) [251006_EP_2]
+- Add patterns for Kubernetes config with credentials (~/.kube/config) [251006_EP_2]
+- Add patterns for private GPG keys (*.gpg, *.asc) [251006_EP_2]
+- Add rules for dd command (can wipe disks) [251006_EP_2]
+- Add rules for mkfs.* commands (filesystem formatting) [251006_EP_2]
+- Add rules for modification of system files (/etc/passwd, /etc/shadow) [251006_EP_2]
