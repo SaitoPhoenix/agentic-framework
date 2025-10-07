@@ -5,7 +5,7 @@ aliases:
   - hook test runner
   - universal hook test runner
 entity_classification: technology/system
-status: new
+status: active
 created: 2025-10-06T00:00:00Z
 last_updated: 2025-10-06T00:00:00Z
 source_episodes:
