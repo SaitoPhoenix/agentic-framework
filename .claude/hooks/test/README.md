@@ -202,6 +202,18 @@ ci:
   fail_on_high_priority_failure: true
 ```
 
+## CI/CD Integration
+
+The test runner integrates with CI/CD pipelines:
+
+- **GitHub Actions workflow** at `.github/workflows/hook-tests.yml`
+- **Automatic testing** on PRs and commits
+- **Test result comments** on pull requests
+- **GitHub annotations** for failed tests
+- **Matrix strategy** for parallel hook type testing
+
+See [CI_CD.md](CI_CD.md) for complete documentation.
+
 ## Examples
 
 See `payloads/pre_tool_use/example_*.json` for comprehensive examples demonstrating:
