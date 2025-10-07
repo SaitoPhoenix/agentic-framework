@@ -109,7 +109,7 @@ pre_compact:
 # SessionStart Hook - Runs when session starts/resumes
 session_start:
   security_guard_validator:
-    enabled: false
+    enabled: true
     module: "security_guard.main"
     function: "check_security"
     config:
@@ -127,7 +127,7 @@ session_start:
     function: "start_conversation_capture"
     config:
       pid_file_name: "conversation_watchdog.pid"
-      episodic_path: ".claude/agents/memory/episodic"
+      episodic_path: ".claude/agent-docs/memory/episodic"
       human_name: "Saito"
       agent_name: "The Architect"
 
@@ -152,4 +152,5 @@ session_end:
 global:
   log_directory: "logs"
   subprocess_timeout: 10
-  verbose_errors: true
+  verbose_logging: false
+  show_errors: true
