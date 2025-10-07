@@ -56,7 +56,7 @@ This section defines critical context needed for evaluation tasks.
 
   * **BRANCH_NAME**: Name of the branch being evaluated
   * **EVALUATOR_REPORT_PATTERN**: Pattern for evaluator report output, defaults to .claude/patterns/reports/evaluator-report_pattern.md
-  * **EVALUATOR_REPORT_PATH**: Directory for evaluation reports, defaults to .claude/agents/reports/$BRANCH_NAME/
+  * **EVALUATOR_REPORT_PATH**: Directory for evaluation reports, defaults to .claude/agent-docs/reports/$BRANCH_NAME/
   * **EVALUATOR_REPORT_FILE**: Final evaluation report, defaults to evaluator-report_python-code-reviewer.md
   * **EVALUATION_SCOPE**: The files/modules/components to evaluate
   * **RUBRIC_PATTERN**: Path to the evaluation rubric, defaults to .claude/patterns/rubrics/code-reviewer-rubric_pattern.md

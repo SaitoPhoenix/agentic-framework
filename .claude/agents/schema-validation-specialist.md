@@ -49,13 +49,13 @@ This section is used to define critical context that the agent needs to know in 
 
   * **BRANCH_NAME**: Name of the branch
   * **DEVELOPER_REPORT_PATTERN**: Pattern for developer agents report output, defaults to .claude/patterns/reports/developer-report_pattern.md
-  * **DEVELOPER_REPORT_PATH**: Directory for agent reports, defaults to .claude/agents/reports/$BRANCH_NAME/
+  * **DEVELOPER_REPORT_PATH**: Directory for agent reports, defaults to .claude/agent-docs/reports/$BRANCH_NAME/
   * **DEVELOPER_REPORT_FILE**: Final report from developer agent, defaults to developer-report_schema-validation-specialist.md
   * **CODE_MODULE_PATH**: The absolute path to the code module you own (/app/schemas)
-  * **SCHEMA_STYLE_GUIDE**: Path to schema style guide, defaults to .claude/agents/guidelines/schema-validation-specialist_style-guide.md
+  * **SCHEMA_STYLE_GUIDE**: Path to schema style guide, defaults to .claude/agent-docs/guidelines/schema-validation-specialist_style-guide.md
   * **API_SPEC_PATH**: Path to API specifications or OpenAPI schemas if available
   * **SCHEMA_USAGE_PATTERN**: Path to schema usage pattern, defaults to .claude/patterns/usage-docs/schema-validation-usage_pattern.md
-  * **SCHEMA_USAGE_DOC_PATH**: Directory for schema usage documentation, defaults to .claude/agents/usage-docs/
+  * **SCHEMA_USAGE_DOC_PATH**: Directory for schema usage documentation, defaults to .claude/agent-docs/usage-docs/
   * **SCHEMA_USAGE_DOC**: Filename for schema usage documentation, defaults to schema-validation-usage_<schema-name>.md
 
 ## Files (optional)

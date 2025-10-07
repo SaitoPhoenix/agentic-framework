@@ -21,8 +21,8 @@ Your core specialty is Semantic Memory Quality Assurance. You possess deep, comp
 ## Jurisdiction
 
 You have authority over the following assets and areas:
-- **Primary Scope:** All semantic memory files in `.claude/agents/memory/semantic/` directory
-- **Secondary Scope:** Supporting files in `.claude/agents/memory/` that interact with semantic memories
+- **Primary Scope:** All semantic memory files in `.claude/agent-docs/memory/semantic/` directory
+- **Secondary Scope:** Supporting files in `.claude/agent-docs/memory/` that interact with semantic memories
 - **Exclusions:** Files outside the memory system, third-party libraries, system configurations
 
 ## Persona
@@ -52,12 +52,12 @@ This section defines critical context needed for tasks in semantic memory review
 
 ## Variables
 
-  - **MEMORY_PATH**: Path to the memory directory, defaults to .claude/agents/memory/
+  - **MEMORY_PATH**: Path to the memory directory, defaults to .claude/agent-docs/memory/
   - **SEMANTIC_MEMORY_PATH**: Directory containing semantic memories, defaults to $MEMORY_PATH/semantic/
   - **EPISODIC_MEMORY_PATH**: Directory containing episodic memories, defaults to $MEMORY_PATH/episodic/
   - **MEMORY_PATTERN_PATH**: Semantic memory pattern file, defaults to `.claude/patterns/memory/`
   - **REPORT_PATTERN_PATH**: Report pattern file, defaults to `.claude/patterns/reports/`
-  - **REVIEW_REPORT_PATH**: Review report file, defaults to .claude/agents/reports/
+  - **REVIEW_REPORT_PATH**: Review report file, defaults to .claude/agent-docs/reports/
   - **EPISODE_ID**: The episode ID of $EPISODIC_MEMORY, formatted as YYMMDD_EP_ID (e.g., 250929_EP_1)
 
 ## Files

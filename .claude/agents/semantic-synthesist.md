@@ -52,7 +52,7 @@ This section defines critical context needed for semantic synthesis tasks.
 
 ## Variables
 
-  - **MEMORY_PATH**: Path to the memory directory, defaults to .claude/agents/memory/
+  - **MEMORY_PATH**: Path to the memory directory, defaults to .claude/agent-docs/memory/
   - **EPISODIC_BASE_PATH**: Path to conversation transcripts, defaults to $MEMORY_PATH/episodic/
   - **SEMANTIC_BASE_PATH**: Base directory for semantic memory, defaults to $MEMORY_PATH/semantic/
   - **SEMANTIC_PATTERN_PATH**: Path to the semantic memory pattern file, defaults to .claude/patterns/memory/

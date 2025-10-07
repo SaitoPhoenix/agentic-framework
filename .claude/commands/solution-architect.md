@@ -56,7 +56,7 @@ This section defines critical context needed for tasks in specification developm
   * **SPEC_PROJECT_PATH**: Directory for project specifications, defaults to $SPEC_PATH/project/
   * **SPEC_FEATURE_PATH**: Directory for feature specifications, defaults to $SPEC_PATH/feature/
   * **SPEC_PATTERNS_PATH**: Specification patterns from .claude/patterns/specs/
-  * **SPEC_GUIDELINES_PATH**: Specification guidelines from .claude/agents/guidelines/specs/
+  * **SPEC_GUIDELINES_PATH**: Specification guidelines from .claude/agent-docs/guidelines/specs/
   * **STAKEHOLDER_INPUT**: Input from human collaborators (Business Owner, Project Manager, etc.)
   * **CODEBASE_PATH**: Root directory of existing codebase to analyze (if applicable)
   * **FEATURE_NAME**: <Optional> Name of the feature being created or updated

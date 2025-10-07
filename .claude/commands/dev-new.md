@@ -15,7 +15,7 @@ WORK_TITLE: 1-3 words describing the work being done
 BRANCH_NAME: Name of the branch (format: $TYPE/$WORK_TITLE)
 MAIN_BRANCH: The name of the main branch of the project, defaults to `main`
 TESTING_PATH: Directory for testing files, defaults to tests/$BRANCH_NAME
-REPORT_PATH: Directory for agent reports, defaults to .claude/agents/reports/$BRANCH_NAME/
+REPORT_PATH: Directory for agent reports, defaults to .claude/agent-docs/reports/$BRANCH_NAME/
 DEVELOPER_REPORT_PATTERN: Pattern for developer agents report output, defaults to .claude/patterns/reports/developer-report_pattern.md
 DEVELOPER_REPORT_FILE: Final report from developer agent, defaults to <developer-agent>_report.md
 

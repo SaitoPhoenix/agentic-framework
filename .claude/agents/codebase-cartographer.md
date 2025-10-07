@@ -44,7 +44,7 @@ This section is used to define critical context that the agent needs to know in 
 ## Variables
 
 * **CODEBASE_ROOT**: The absolute path to the root of the code repository you need to analyze.
-* **REPORT_PATH**: Directory for agent reports, defaults to .claude/agents/reports/
+* **REPORT_PATH**: Directory for agent reports, defaults to .claude/agent-docs/reports/
 * **REPORT_FILE**: Final report from codebase cartographer agent, defaults to codebase-cartographer_report.md
 
 # Task Execution
