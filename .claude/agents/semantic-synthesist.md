@@ -63,35 +63,41 @@ This section defines critical context needed for semantic synthesis tasks.
 
 ## Files
 
-  - **EPISODIC_MEMORY**: The JSON transcript file at $EPISODIC_BASE_PATH/**/$EPISODE_ID.json
+  - **EPISODIC_MEMORY**: Search for $EPISODIC_BASE_PATH/**/$EPISODE_ID.json to find the JSON transcript file
   - **SEMANTIC_ENTITY**: The semantic memory file at $SEMANTIC_BASE_PATH/$ENTITY_CLASSIFICATION_PATH/$ENTITY_NAME.md
   - **SEMANTIC_PATTERN**: The semantic memory pattern file at $SEMANTIC_PATTERN_PATH/semantic-memory_pattern.md
   - **RELATIONSHIP_TYPOLOGY**: The relationship typology file at $MEMORY_PATH/relationship-typology.yaml
 
 # Task Execution
 
-This section defines the systematic process for semantic synthesis.
+This section defines the systematic process for semantic synthesis
 
 ## Workflow
 
-Execute these steps in order.
-**IMPORTANT** Follow the instructions for each step.
+Execute these steps in order
+**IMPORTANT** Follow the instructions for each step
 
-1. Read $EPISODIC_MEMORY and $SEMANTIC_PATTERN
-2. Parse episodic memory to understand the conversation flow
-3. Analyze conversation context and subtext
-4. Extract entities and their classifications
-5. Check existing semantic memory for matching entities
-6. Identify relationships between entities
-7. Synthesize and structure knowledge using $SEMANTIC_PATTERN
-8. Write semantic memory files
+1. Read $EPISODIC_MEMORY
+2. Read $SEMANTIC_PATTERN
+3. Parse episodic memory to understand the conversation flow
+4. Analyze conversation context and subtext
+5. Extract entities and their classifications
+6. Check existing semantic memory for matching entities
+7. Identify relationships between entities
+8. Synthesize and structure knowledge using $SEMANTIC_PATTERN
+9. Write semantic memory files
 
 ## Instructions
 
 ### Reading Episodic Memory
-  - Read the entire $EPISODIC_MEMORY and $SEMANTIC_PATTERN
-  - If the file is too large, attempt to read it in chunks of 50 lines at a time.
-  - If you are still unable to read the entire file, **STOP** and inform the user that you are unable to read the file.
+  - Read the entire $EPISODIC_MEMORY
+  - If the file is too large, attempt to read it in chunks of 50 lines at a time, or less if necessary
+  - Keep track of which lines you have read
+  - Verify that you have read **ALL** lines in the file
+  - If you are still unable to read the entire file, **STOP** and inform the user that you are unable to read the file
+
+### Reading Semantic Pattern
+  - Read the entire $SEMANTIC_PATTERN
 
 ### Parsing Episodic Memory
   - Extract metadata (speakers, timestamps, operations, order)
