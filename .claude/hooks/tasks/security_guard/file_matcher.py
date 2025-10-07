@@ -4,8 +4,11 @@ File Matcher - Gitignore-style pattern matching for file rules
 """
 
 import pathspec
+import re
 from typing import Dict, Any, List, Optional, Tuple
 from pathlib import Path
+
+from .shell_parser import extract_paths_from_command, normalize_path_with_quotes
 
 
 def check_file_rules(
@@ -57,7 +60,9 @@ def check_file_rules(
             continue
 
         # Check if pattern matches
-        if matches_file_pattern(normalized_path, pattern):
+        match_result = matches_file_pattern(normalized_path, pattern)
+
+        if match_result:
             # Use custom message or default
             if not message:
                 message = f"Sensitive file access prevented for safety: {pattern}"
@@ -69,7 +74,7 @@ def check_file_rules(
 
 def matches_file_pattern(file_path: str, pattern: str) -> bool:
     """
-    Check if a file path matches a gitignore-style pattern.
+    Check if a file path matches a gitignore-style pattern (case-insensitive).
 
     Args:
         file_path: File path to check
@@ -83,25 +88,43 @@ def matches_file_pattern(file_path: str, pattern: str) -> bool:
     if is_negation:
         pattern = pattern[1:]  # Remove ! prefix
 
+    # Normalize to lowercase for case-insensitive matching
+    file_path_lower = file_path.lower()
+    pattern_lower = pattern.lower()
+
+    # Remember if pattern was originally a simple filename pattern (no path separators)
+    is_filename_pattern = "/" not in pattern_lower and not pattern_lower.startswith("**")
+
     # Treat pattern as global if it doesn't start with / or contain /
-    if "/" not in pattern and not pattern.startswith("**"):
-        pattern = f"**/{pattern}"
+    if is_filename_pattern:
+        pattern_lower = f"**/{pattern_lower}"
 
     # Create pathspec matcher
-    spec = pathspec.PathSpec.from_lines("gitwildmatch", [pattern])
+    spec = pathspec.PathSpec.from_lines("gitwildmatch", [pattern_lower])
 
-    # Check match
-    matches = spec.match_file(file_path)
+    # Check match on full path
+    full_match = spec.match_file(file_path_lower)
+    if full_match:
+        return True
 
-    # For negation patterns (!), we want to match only files that match the pattern
-    # For regular patterns, we want to match files that match the pattern
-    # Both return True when the file matches the pattern (after removing !)
-    return matches
+    # Also check if the filename ends with the pattern (for patterns without path separators)
+    # This handles cases like "secrets.json" matching "my secrets.json"
+    if is_filename_pattern:
+        basename = Path(file_path_lower).name
+        # Extract just the filename part from the original pattern (after **//)
+        filename_pattern = pattern_lower.replace("**/", "")
+        # Check if basename ends with the pattern
+        if basename.endswith(filename_pattern):
+            return True
+
+    return False
 
 
 def extract_file_from_bash(command: str) -> Optional[str]:
     """
     Extract file path from bash command for pattern matching.
+
+    Handles quoted paths with spaces.
 
     Args:
         command: Bash command string
@@ -109,21 +132,11 @@ def extract_file_from_bash(command: str) -> Optional[str]:
     Returns:
         Extracted file path or None
     """
-    # Common patterns for file operations in bash
-    file_patterns = [
-        r"cat\s+(\S+)",
-        r"echo\s+.*>\s*(\S+)",
-        r"touch\s+(\S+)",
-        r"cp\s+\S+\s+(\S+)",
-        r"mv\s+\S+\s+(\S+)",
-        r"rm\s+.*\s+(\S+)",
-    ]
+    # Use shell parser to extract paths
+    paths = extract_paths_from_command(command)
 
-    import re
-
-    for pattern in file_patterns:
-        match = re.search(pattern, command)
-        if match:
-            return match.group(1)
+    if paths:
+        # Return first path found, normalized to handle quotes
+        return normalize_path_with_quotes(paths[0])
 
     return None

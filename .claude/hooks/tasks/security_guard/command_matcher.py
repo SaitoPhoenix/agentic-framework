@@ -6,6 +6,12 @@ Command Matcher - Pattern matching for dangerous bash commands
 import re
 from typing import Dict, Any, List, Optional, Tuple
 
+from .shell_parser import (
+    extract_all_commands,
+    contains_variable_reference,
+    extract_variable_references,
+)
+
 
 def check_command_rules(
     tool_name: str,
@@ -33,19 +39,92 @@ def check_command_rules(
     if not command:
         return None
 
+    # First, check rules with regex patterns against the FULL command
+    # This is important for detecting things like "curl ... | sh"
+    result = check_full_command_patterns(command, command_rules, permission_level)
+    if result:
+        return result
+
+    # Then extract all commands (handles chaining, pipes, subshells)
+    # and check each extracted command against rules
+    all_commands = extract_all_commands(command)
+
+    # Check each extracted command against rules
+    for cmd in all_commands:
+        result = check_single_command(cmd, command_rules, permission_level)
+        if result:
+            return result
+
+    return None
+
+
+def check_full_command_patterns(
+    command: str,
+    command_rules: List[Dict[str, Any]],
+    permission_level: str,
+) -> Optional[Tuple[str, str, str]]:
+    """
+    Check if the full command matches any regex patterns in rules.
+
+    This must be done BEFORE command decomposition to catch patterns like
+    "curl ... | sh" which would be lost when commands are split.
+
+    Args:
+        command: Full command string
+        command_rules: List of command rule dictionaries
+        permission_level: "allow", "ask", or "deny"
+
+    Returns:
+        Tuple of (permission, message, matched_command) if match found, None otherwise
+    """
+    normalized_command = " ".join(command.lower().split())
+
+    for rule in command_rules:
+        base_command = rule.get("command", "").lower()
+        patterns = rule.get("patterns", [])
+        message = rule.get("message", "")
+
+        # Only process rules with patterns
+        if not patterns:
+            continue
+
+        # Check if base command is in the full command
+        if base_command not in normalized_command:
+            continue
+
+        # Check if any pattern matches
+        if matches_any_pattern(command, patterns):
+            if not message:
+                message = f"Dangerous command prevented for safety: {base_command}"
+            return (permission_level, message, base_command)
+
+    return None
+
+
+def check_single_command(
+    command: str,
+    command_rules: List[Dict[str, Any]],
+    permission_level: str,
+) -> Optional[Tuple[str, str, str]]:
+    """
+    Check a single command against command rules.
+
+    Args:
+        command: Single command string to check
+        command_rules: List of command rule dictionaries
+        permission_level: "allow", "ask", or "deny"
+
+    Returns:
+        Tuple of (permission, message, matched_command) if match found, None otherwise
+    """
     # Normalize command
     normalized_command = " ".join(command.lower().split())
 
     # Check each rule
     for rule in command_rules:
         base_command = rule.get("command", "").lower()
-        rule_tools = rule.get("tools", [])
         message = rule.get("message", "")
         block_always = rule.get("block_always", False)
-
-        # Skip if tool-specific rule doesn't apply to this tool
-        if rule_tools and tool_name not in rule_tools:
-            continue
 
         # Check if base command matches
         if not command_matches_base(normalized_command, base_command):
@@ -75,7 +154,7 @@ def check_command_rules(
         # When only one condition is specified, only that one must match
 
         flags_match = not dangerous_flags or has_dangerous_flags(normalized_command, dangerous_flags)
-        paths_match = not dangerous_paths or has_dangerous_paths(normalized_command, dangerous_paths)
+        paths_match = not dangerous_paths or has_dangerous_paths(command, dangerous_paths)
         patterns_match = not patterns or matches_any_pattern(command, patterns)
 
         # All specified conditions must match
@@ -122,17 +201,19 @@ def has_dangerous_flags(command: str, dangerous_flags: List[List[str]]) -> bool:
 
 def has_dangerous_paths(command: str, dangerous_paths: List[str]) -> bool:
     """
-    Check if command contains dangerous paths as literal arguments.
+    Check if command contains dangerous paths as literal arguments or variables.
 
     Matches exact path arguments only, not substrings.
     For example, "/" matches "rm -rf /" but not "rm -rf a/b"
 
+    Also detects variable references which could expand to dangerous paths.
+
     Args:
-        command: Normalized command string
+        command: Command string (not normalized, to preserve variables)
         dangerous_paths: List of dangerous literal paths
 
     Returns:
-        True if any dangerous path is present as an argument
+        True if any dangerous path is present as an argument or if variables are present
     """
     # Split command into tokens to check arguments
     tokens = command.split()
@@ -141,7 +222,20 @@ def has_dangerous_paths(command: str, dangerous_paths: List[str]) -> bool:
         path_lower = path.lower()
 
         # Check if this path appears as a literal argument
-        if path_lower in tokens:
+        for token in tokens:
+            if token.lower() == path_lower:
+                return True
+
+    # Check if command contains variable references that could be dangerous
+    # Variables in paths are inherently risky since we don't know their expansion
+    for token in tokens:
+        # Skip the command name and flags
+        if token.startswith('-'):
+            continue
+
+        # Check if token contains variable reference
+        if contains_variable_reference(token):
+            # Variable could expand to any of the dangerous paths
             return True
 
     return False
