@@ -59,7 +59,13 @@ def log_hook_data(
         with open(log_path, "w") as f:
             json.dump(log_data, f, indent=2)
 
+        # Log success message if verbose logging is enabled
+        if global_config.get("verbose_logging", False):
+            return {
+                "systemMessage": f"Successfully logged {hook_name} data to {log_path}"
+            }
+
     except Exception as e:
-        # Fail silently unless verbose errors are enabled
-        if global_config.get("verbose_errors", False):
-            print(f"Log hook error: {e}", file=sys.stderr)
+        # Fail silently unless verbose logging is enabled
+        if global_config.get("show_errors", True):
+            return {"systemMessage": f"Log hook error: {e}"}

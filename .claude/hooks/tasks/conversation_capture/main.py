@@ -11,26 +11,44 @@ import sys
 import subprocess
 from pathlib import Path
 from datetime import datetime
+from typing import Dict, Any, Optional
 
 
 def start_conversation_capture(
-    input_data,
-    human_name="Human",
-    agent_name="Assistant",
-    pid_file_name="conversation_watchdog.pid",
-    episodic_path=".claude/agents/memory/episodic",
+    input_data: Dict[str, Any],
+    global_config: Dict[str, Any],
+    human_name: str = "Human",
+    agent_name: str = "Assistant",
+    pid_file_name: str = "conversation_watchdog.pid",
+    episodic_path: str = ".claude/agents/memory/episodic",
     **kwargs,
-):
-    """Start conversation capture subprocess if enabled."""
+) -> Optional[Dict[str, Any]]:
+    """
+    Start conversation capture subprocess if enabled.
+
+    Args:
+        input_data: The input data received by the hook
+        global_config: Global configuration settings
+        human_name: Name to use for human in conversation
+        agent_name: Name to use for agent in conversation
+        pid_file_name: Name of PID file to store process ID
+        episodic_path: Path to episodic memory directory
+        **kwargs: Additional configuration parameters (unused)
+
+    Returns:
+        Optional dict with systemMessage if verbose logging is enabled
+    """
     try:
+        verbose_logging = global_config.get("verbose_logging", False)
+        show_errors = global_config.get("show_errors", False)
         transcript_path = input_data.get("transcript_path", "")
 
         if not transcript_path:
-            print(
-                "No transcript path provided, skipping conversation capture",
-                file=sys.stderr,
-            )
-            return
+            if verbose_logging:
+                return {
+                    "systemMessage": "No transcript path provided, skipping conversation capture"
+                }
+            return None
 
         # Create hierarchical output file path with sequential numbering
         now = datetime.now()
@@ -74,11 +92,11 @@ def start_conversation_capture(
         watchdog_script = script_dir / "conversation_watchdog.py"
 
         if not watchdog_script.exists():
-            print(
-                f"Conversation watchdog script not found at {watchdog_script}",
-                file=sys.stderr,
-            )
-            return
+            if verbose_logging or show_errors:
+                return {
+                    "systemMessage": f"Conversation watchdog script not found at {watchdog_script}"
+                }
+            return None
 
         # Build command arguments
         cmd = [
@@ -103,8 +121,11 @@ def start_conversation_capture(
         with open(pid_file, "w") as f:
             f.write(str(process.pid))
 
-        print(f"Started conversation capture subprocess (PID: {process.pid})")
-        print(f"Output will be written to: {output_file}")
+        return {
+            "systemMessage": f"Started conversation capture subprocess (PID: {process.pid}).\nOutput will be written to: {output_file}"
+        }
 
     except Exception as e:
-        print(f"Failed to start conversation capture: {e}", file=sys.stderr)
+        if global_config.get("show_errors", True):
+            return {"systemMessage": f"Failed to start conversation capture: {e}"}
+        return None

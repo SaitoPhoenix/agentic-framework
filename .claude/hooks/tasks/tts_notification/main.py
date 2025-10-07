@@ -192,7 +192,7 @@ def announce_tts(
     choose_random: Optional[bool] = False,
     user_name: Optional[str] = None,
     **kwargs,
-) -> None:
+) -> Optional[Dict[str, Any]]:
     """
     Announce a completion message using LLM-generated text and TTS.
 
@@ -210,20 +210,23 @@ def announce_tts(
         choose_random: Whether to choose a random message from the pattern
         user_name: User's name for personalization
         **kwargs: Additional configuration parameters (unused)
+
+    Returns:
+        Optional dict with systemMessage if verbose logging is enabled
     """
     try:
         # Get timeout from global config
         timeout = global_config.get("subprocess_timeout", 10)
-        verbose_errors = global_config.get("verbose_errors", False)
+        verbose_logging = global_config.get("verbose_logging", False)
+        show_errors = global_config.get("show_errors", False)
 
         # Validate required configurations
         if not tts:
-            if verbose_errors:
-                print(
-                    "TTS notification error: missing tts configuration",
-                    file=sys.stderr,
-                )
-            return
+            if verbose_logging or show_errors:
+                return {
+                    "systemMessage": "TTS notification error: missing tts configuration"
+                }
+            return None
 
         # Step 1: Load and render the pattern template
         try:
@@ -231,9 +234,9 @@ def announce_tts(
                 message_pattern, user_name, choose_random
             )
         except FileNotFoundError as e:
-            if verbose_errors:
-                print(f"TTS notification error: {e}", file=sys.stderr)
-            return
+            if verbose_logging or show_errors:
+                return {"systemMessage": f"TTS notification error: {e}"}
+            return None
 
         # Step 2: Generate message (use LLM if configured, otherwise use pattern directly)
         if llm:
@@ -251,12 +254,11 @@ def announce_tts(
             )
 
             if not generated_message:
-                if verbose_errors:
-                    print(
-                        "TTS notification error: LLM CLI failed to generate message",
-                        file=sys.stderr,
-                    )
-                return
+                if verbose_logging or show_errors:
+                    return {
+                        "systemMessage": "TTS notification error: LLM CLI failed to generate message"
+                    }
+                return None
         else:
             # No LLM configured, use the rendered pattern directly
             generated_message = pattern_prompt
@@ -274,13 +276,20 @@ def announce_tts(
             timeout=timeout,
         )
 
-        if not success and verbose_errors:
-            print(
-                "TTS notification error: TTS CLI failed to play message",
-                file=sys.stderr,
-            )
+        if not success and (verbose_logging or show_errors):
+            return {
+                "systemMessage": "TTS notification error: TTS CLI failed to play message"
+            }
+
+        if verbose_logging:
+            return {
+                "systemMessage": f"TTS notification played successfully: {generated_message[:50]}..."
+            }
+
+        return None
 
     except Exception as e:
         # Fail silently for any other errors
-        if global_config.get("verbose_errors", False):
-            print(f"TTS notification error: {e}", file=sys.stderr)
+        if global_config.get("show_errors", True):
+            return {"systemMessage": f"TTS notification error: {e}"}
+        return None
