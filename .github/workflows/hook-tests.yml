@@ -1,0 +1,190 @@
+name: Hook Tests
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - '.claude/hooks/**'
+      - '.claude/hooks/test/**'
+      - '.github/workflows/hook-tests.yml'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - '.claude/hooks/**'
+      - '.claude/hooks/test/**'
+      - '.github/workflows/hook-tests.yml'
+  workflow_dispatch:  # Allow manual triggering
+
+jobs:
+  test:
+    name: Test ${{ matrix.hook-type }} hooks
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        hook-type:
+          - PreToolUse
+          - PostToolUse
+          - UserPromptSubmit
+          # Add other hook types as tests are created
+          # - Notification
+          # - Stop
+          # - SubagentStop
+          # - PreCompact
+          # - SessionStart
+          # - SessionEnd
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Check if tests exist for ${{ matrix.hook-type }}
+        id: check-tests
+        run: |
+          TEST_DIR=".claude/hooks/test/payloads/$(echo ${{ matrix.hook-type }} | sed 's/\([A-Z]\)/_\L\1/g' | sed 's/^_//')"
+          if [ -d "$TEST_DIR" ] && [ -n "$(ls -A $TEST_DIR/*.json 2>/dev/null)" ]; then
+            echo "has_tests=true" >> $GITHUB_OUTPUT
+            echo "✅ Found tests in $TEST_DIR"
+          else
+            echo "has_tests=false" >> $GITHUB_OUTPUT
+            echo "⏭️  No tests found in $TEST_DIR, skipping"
+          fi
+
+      - name: Download baseline
+        if: steps.check-tests.outputs.has_tests == 'true'
+        continue-on-error: true
+        run: |
+          # In a real setup, you might store baseline in artifact storage
+          # For now, we'll use the committed baseline if it exists
+          if [ -f ".claude/hooks/test/reports/baseline.json" ]; then
+            echo "✅ Using committed baseline"
+          else
+            echo "⚠️  No baseline found"
+          fi
+
+      - name: Run ${{ matrix.hook-type }} tests
+        if: steps.check-tests.outputs.has_tests == 'true'
+        id: run-tests
+        run: |
+          cd .claude/hooks/test
+          uv run test_runner.py \
+            --hook-type ${{ matrix.hook-type }} \
+            --verbose \
+            --check-regression \
+            2>&1 | tee test-output.log
+
+          # Capture exit code
+          EXIT_CODE=${PIPESTATUS[0]}
+          echo "exit_code=$EXIT_CODE" >> $GITHUB_OUTPUT
+
+          # Exit with the original code
+          exit $EXIT_CODE
+
+      - name: Upload test reports
+        if: steps.check-tests.outputs.has_tests == 'true' && always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports-${{ matrix.hook-type }}
+          path: |
+            .claude/hooks/test/reports/latest.json
+            .claude/hooks/test/reports/latest.md
+            .claude/hooks/test/test-output.log
+          retention-days: 30
+
+      - name: Generate test annotations
+        if: steps.check-tests.outputs.has_tests == 'true' && failure()
+        run: |
+          # Parse JSON report and create GitHub annotations
+          REPORT=".claude/hooks/test/reports/latest.json"
+
+          if [ -f "$REPORT" ]; then
+            # Extract failures and create annotations
+            python3 << 'EOF'
+          import json
+          import os
+
+          with open('.claude/hooks/test/reports/latest.json', 'r') as f:
+              report = json.load(f)
+
+          failures = report.get('failures', [])
+
+          for failure in failures:
+              test_id = failure.get('test_id', 'unknown')
+              category = failure.get('category', 'unknown')
+              priority = failure.get('priority', 'unknown')
+              error = failure.get('error', 'Test failed')
+
+              # Determine annotation level based on priority
+              level = 'error' if priority == 'critical' else 'warning'
+
+              # Create GitHub annotation
+              print(f"::{level} title=Test Failed: {test_id}::{category} test failed - {error}")
+          EOF
+          fi
+
+      - name: Comment on PR with results
+        if: steps.check-tests.outputs.has_tests == 'true' && github.event_name == 'pull_request' && always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const reportPath = '.claude/hooks/test/reports/latest.md';
+
+            if (!fs.existsSync(reportPath)) {
+              console.log('No report found, skipping comment');
+              return;
+            }
+
+            const report = fs.readFileSync(reportPath, 'utf8');
+            const hookType = '${{ matrix.hook-type }}';
+
+            const body = `## Hook Tests: ${hookType}
+
+            ${report}
+
+            <details>
+            <summary>View full test output</summary>
+
+            \`\`\`
+            ${fs.readFileSync('.claude/hooks/test/test-output.log', 'utf8').slice(0, 30000)}
+            \`\`\`
+
+            </details>`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });
+
+  summary:
+    name: Test Summary
+    runs-on: ubuntu-latest
+    needs: test
+    if: always()
+
+    steps:
+      - name: Check test results
+        run: |
+          echo "All hook tests completed"
+
+          # The job will fail if any test job failed
+          if [ "${{ needs.test.result }}" != "success" ]; then
+            echo "❌ Some tests failed"
+            exit 1
+          else
+            echo "✅ All tests passed"
+          fi
