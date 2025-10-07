@@ -180,6 +180,7 @@ temp/
 .claude/hooks/pid/*
 .mcp.json
 .claude/commands/temp.md
+.claude/hooks/test/reports/
 #CLAUDE.md
 
 # Slack data
