@@ -3,7 +3,7 @@ name: the-architect
 aliases:
   - The Architect
 entity_classification: person
-status: updated
+status: active
 created: 2025-10-04T21:14:00Z
 last_updated: 2025-10-06T00:00:00Z
 source_episodes:
