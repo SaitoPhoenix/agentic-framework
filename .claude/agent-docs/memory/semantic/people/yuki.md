@@ -1,7 +1,7 @@
 ---
-name: the-architect
+name: yuki
 aliases:
-  - The Architect
+  - Yuki
 entity_classification: person
 status: active
 created: 2025-10-04T21:14:00Z

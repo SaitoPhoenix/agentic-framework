@@ -24,8 +24,8 @@ relationships:
     role: consumer
     source: 251003_EP_7
   - type: designed_by
-    entity: the-architect
-    description: The Architect implemented the security guard task based on Saito's requirements
+    entity: yuki
+    description: Yuki implemented the security guard task based on Saito's requirements
     role: implementation
     source: 251003_EP_7
   - type: used_by

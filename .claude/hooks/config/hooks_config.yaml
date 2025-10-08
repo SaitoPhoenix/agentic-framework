@@ -129,7 +129,7 @@ session_start:
       pid_file_name: "conversation_watchdog.pid"
       episodic_path: ".claude/agent-docs/memory/episodic"
       human_name: "Saito"
-      agent_name: "The Architect"
+      agent_name: "Yuki"
 
 # SessionEnd Hook - Runs when session ends
 session_end:

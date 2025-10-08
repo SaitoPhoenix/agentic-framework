@@ -12,7 +12,7 @@ summary: Technical lead who provides requirements and guidance for the Claude Co
 ambiguities: []
 relationships:
   - type: guides
-    entity: the-architect
+    entity: yuki
     description: Provides requirements and feedback for implementation
     role: technical lead
     source: 251003_EP_7

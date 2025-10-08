@@ -19,8 +19,8 @@ relationships:
     role: testing component
     source: 251006_EP_2
   - type: designed_by
-    entity: the-architect
-    description: The Architect designed and implemented the complete test framework
+    entity: yuki
+    description: Yuki designed and implemented the complete test framework
     role: implementation
     source: 251006_EP_2
   - type: uses
