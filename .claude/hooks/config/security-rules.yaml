@@ -79,6 +79,16 @@ blacklist:
         message: "Secrets file access is blocked"
 
     commands:
+      # Dangerous cd commands
+      - command: "cd"
+        paths: ["-", "--", "~", "~/", "$HOME", "/"]
+        message: "Dangerous cd command is blocked, access to root or home directory is prohibited"
+
+      # Prevent relative path directory traversal
+      - command: "cd"
+        patterns: ['\.\.']
+        message: "Relative path directory traversal is blocked"
+
       # Dangerous rm commands
       - command: "rm"
         flags:
