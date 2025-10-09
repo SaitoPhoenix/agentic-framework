@@ -79,6 +79,14 @@ blacklist:
         message: "Secrets file access is blocked"
 
     commands:
+      # Prevent direct python commands
+      - command: "python"
+        message: "Don't use Python directly, use uv run python instead"
+
+      # Prevent direct python commands
+      - command: "python3"
+        message: "Don't use python3 directly, use uv run python instead"
+
       # Dangerous cd commands
       - command: "cd"
         paths: ["-", "--", "~", "~/", "$HOME", "/"]

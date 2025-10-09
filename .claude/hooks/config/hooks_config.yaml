@@ -5,7 +5,7 @@
 # Quick Reference:
 # - Available hooks: stop, notification, subagent_stop, user_prompt_submit,
 #   pre_tool_use, post_tool_use, pre_compact, session_start, session_end
-# - Available tasks: log_hook, tts_notification, conversation_capture, cleanup_subprocesses, security_guard
+# - Available tasks: log_hook, tts_notification, conversation_capture, cleanup_subprocesses, security_guard, worktree_permissions
 # - Docs: https://docs.claude.com/en/docs/claude-code/hooks
 
 # ============================================================================
@@ -74,6 +74,12 @@ user_prompt_submit:
 
 # PreToolUse Hook - Runs before tool calls
 pre_tool_use:
+  worktree_permissions:
+    enabled: true
+    module: "worktree_permissions.main"
+    function: "check_permissions"
+    config:
+      config_file: ".claude/hooks/config/worktree-permissions.yaml"
   security_guard:
     enabled: true
     module: "security_guard.main"

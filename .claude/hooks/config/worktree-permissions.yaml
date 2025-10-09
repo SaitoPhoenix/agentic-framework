@@ -1,141 +1,198 @@
 # Claude Code Worktree Permissions Configuration
-# This file defines tool permissions for different worktree environments
-# 
+# This file defines tool permissions for worktree environments
+#
 # Permission levels:
 #   - Allow: Tool is permitted without confirmation
-#   - Ask: Tool requires user confirmation (default)
+#   - Ask: Tool requires user confirmation
 #   - Deny: Tool is blocked completely
 #
-# Tool naming follows Claude Code format:
+# Tool naming follows Claude Code format (see .claude/ref_docs/anthropic_tools.md):
 #   - "Bash": All bash commands
 #   - "Bash(git status:*)": Specific bash command patterns
-#   - "Read", "Write", "Edit": File operations
-#   - "WebFetch": Web requests
+#   - "Read", "Write", "Edit", "MultiEdit": File operations
+#   - "WebFetch", "WebSearch": Web operations
+#   - "Glob", "Grep": Search operations
+#   - "Task", "SlashCommand": Agent operations
 
-# Global settings applied to ALL worktrees
+# ============================================================================
+# GLOBAL SETTINGS
+# ============================================================================
+
 global:
-  # Default permission for unspecified tools
-  default_permission: Ask
-  
   # Enable/disable worktree permissions entirely
   enabled: true
-  
-  # Log permission decisions
-  log_permissions: true
-  
-  # Tools that are always allowed in any worktree
-  always_allow:
-    - "Read"
-    - "Bash(pwd:*)"
-    - "Bash(cd:*)"    
-    - "Bash(ls:*)"
-    - "Bash(mkdir:*)"
-    - "Bash(uv:*)"
-    - "Bash(find:*)"
-    - "Bash(mv:*)"
-    - "Bash(grep:*)"
-    - "Bash(npm:*)"
-    - "Bash(cp:*)"
-    - "Bash(chmod:*)"
-    - "Bash(touch:*)"
-    - "Bash(git status:*)"
-    - "Bash(git log:*)"
-    - "Bash(git diff:*)"
-    - "Bash(git show:*)"
-    - "Bash(git branch:*)"
-    - "Bash(git worktree:*)"
-    - "Bash(git rev-parse:*)"
-    - "Grep"
-    - "Glob"
-  
-  # Tools that are always denied in worktrees (security)
-  always_deny:
-    - "Bash(rm -rf:*)"
-    - "Bash(sudo:*)"
-    - "Bash(su:*)"
-    - "Bash(chmod 777:*)"
-    
 
-# Specific worktree configurations
-# Key format: "worktree_BRANCHNAME" matches the worktree directory naming
-worktrees:
-  
-  # Production/main branch worktrees - more restrictive
-  worktree_main:
+  # Default permission for tools not explicitly specified
+  default_permission: Ask
+
+  # Log permission decisions for debugging
+  log_permissions: true
+
+  # Enforce path boundaries - deny operations outside worktree
+  enforce_boundaries: true
+
+  # Tools that are ALWAYS allowed in any worktree (read-only operations)
+  always_allow:
+    - "Read"                      # Read any file (including outside worktree)
+    - "Grep"                      # Search file contents
+    - "Glob"                      # Find files by pattern
+    - "Task"                      # Sub-agents
+    - "TodoWrite"                 # Task management
+    - "Bash(git status:*)"        # Git status
+    - "Bash(git log:*)"           # Git history
+    - "Bash(git diff:*)"          # Git diffs
+    - "Bash(git show:*)"          # Show commits
+    - "Bash(git branch:*)"        # List branches
+    - "Bash(git worktree:*)"      # Worktree commands
+    - "Bash(git rev-parse:*)"     # Git inspection
+    - "Bash(pwd:*)"               # Print working directory
+    - "Bash(ls:*)"                # List files
+    - "Bash(find:*)"              # Find files
+    - "Bash(mkdir:*)"             # Create directories
+    - "Bash(grep:*)"              # Search text
+    - "Bash(eza:*)"                # List files
+
+
+  # Tools that are ALWAYS denied in worktrees (security)
+  always_deny:
+    - "Bash(rm -rf /:*)"          # Recursive delete from root
+    - "Bash(sudo:*)"              # Superuser commands
+    - "Bash(su:*)"                # Switch user
+    - "Bash(chmod 777:*)"         # Overly permissive permissions
+
+# ============================================================================
+# SPECIAL: cd COMMAND HANDLING
+# ============================================================================
+# The cd (change directory) command is handled specially:
+#   - ALWAYS allowed within worktree boundaries
+#   - ALWAYS denied when attempting to exit worktree boundaries
+#   - This enforcement happens regardless of branch type or permissions
+#
+# Users should understand:
+#   - You can freely navigate within your worktree
+#   - Attempting to cd outside the worktree will be blocked with a message
+#   - This is to maintain isolation and prevent accidental cross-worktree operations
+
+# ============================================================================
+# MAIN WORKING TREE PERMISSIONS
+# ============================================================================
+# Optional: Apply permissions to the main working tree (not a linked worktree)
+# If enabled=false, main working tree uses default Claude Code permissions
+
+main_worktree:
+  enabled: false  # Set to true to override default Claude Code permissions
+  permissions:
+    "Write": Ask
+    "Edit": Ask
+    "MultiEdit": Ask
+    "Bash(git push:*)": Ask
+    "Bash(git push -f:*)": Deny
+    "WebFetch": Ask
+
+# ============================================================================
+# LINKED WORKTREE PERMISSIONS BY BRANCH TYPE
+# ============================================================================
+# Permissions are based on branch type extracted from branch name pattern: TYPE/name
+# Examples: feat/new-feature, fix/bug-123, docs/update-readme
+#
+# Branch types follow GitHub Flow conventions:
+#   - feat: New features
+#   - fix: Bug fixes
+#   - hotfix: Urgent production fixes
+#   - refactor: Code refactoring
+#   - perf: Performance improvements
+#   - test: Testing code
+#   - docs: Documentation changes
+#   - chore: Non-code changes (build, CI, etc.)
+#   - build: Build system changes
+#   - ci: CI/CD pipeline changes
+#   - security: Security-related changes
+#   - exp: Experimental branches
+
+branch_permissions:
+
+  # Feature development branches: feat/*
+  - branch_types: [feat]
+    reason: "Feature branch allows collaborative development with safeguards"
     permissions:
-      "Write": Ask
-      "Edit": Ask
-      "MultiEdit": Ask
-      "Bash(git add:*)": Ask
-      "Bash(git commit:*)": Ask
-      "Bash(git push:*)": Deny
-      "Bash(npm:*)": Ask
-      "Bash(python:*)": Ask
-      "Bash(uv:*)": Ask
-      "WebFetch": Deny
-      
-  # Hotfix worktrees - limited permissions
-  worktree_hotfix:
+      "Write": Allow
+      "Edit": Allow
+      "MultiEdit": Allow
+      "Bash(git add:*)": Allow
+      "Bash(git commit:*)": Allow
+      "Bash(git push:*)": Ask    # Confirm before pushing
+      "Bash(git push -f:*)": Deny # Never force push
+      "Bash(gh pr:*)": Allow     # GitHub PR commands
+      "Bash(npm:*)": Allow
+      "Bash(uv:*)": Allow
+      "WebFetch": Ask
+      "WebSearch": Ask
+
+  # Bug fixes and hotfixes: fix/*, hotfix/*
+  - branch_types: [fix, hotfix]
+    reason: "Bug fix branch focused on resolving issues without external dependencies"
     permissions:
-      "Write": Ask
+      "Read": Allow
+      "Write": Allow
       "Edit": Allow
       "MultiEdit": Ask
       "Bash(git add:*)": Allow
       "Bash(git commit:*)": Allow
       "Bash(git push:*)": Ask
-      "Bash(npm:*)": Deny
-      "Bash(python:*)": Ask
-      "Bash(uv:*)": Ask
-      "WebFetch": Deny
-      
-  # Testing worktrees - restricted file operations
-  worktree_test:
+      "Bash(git push -f:*)": Deny
+      "Bash(gh pr:*)": Allow
+      "Bash(npm:*)": Allow
+      "Bash(uv:*)": Allow
+      "WebFetch": Deny           # No external fetches for fixes
+
+  # Refactoring branches: refactor/*, Performance optimization branches: perf/*
+  - branch_types: [refactor, perf]
+    reason: "Refactoring and performance branches require careful code changes"
     permissions:
-      "Write": Ask
+      "Write": Allow
+      "Edit": Allow
+      "MultiEdit": Allow
+      "Bash(git add:*)": Allow
+      "Bash(git commit:*)": Allow
+      "Bash(git push:*)": Ask
+      "Bash(git push -f:*)": Deny
+      "Bash(gh pr:*)": Ask
+      "Bash(npm:*)": Allow
+      "Bash(uv:*)": Allow
+      "WebFetch": Deny
+
+  # Testing branches: test/*
+  - branch_types: [test]
+    reason: "Testing branch restricted to running tests, not making code changes"
+    permissions:
+      "Write": Ask               # Careful with test file changes
       "Edit": Ask
       "MultiEdit": Deny
-      "Bash(git add:*)": Deny
+      "Bash(git add:*)": Deny    # Usually don't commit from test branches
       "Bash(git commit:*)": Deny
-      "Bash(git push:*)": Deny
-      "Bash(npm test:*)": Allow
-      "Bash(python -m pytest:*)": Allow
+      "Bash(npm test:*)": Allow  # Run tests
       "Bash(uv run pytest:*)": Allow
+      "Bash(uv run python:*)": Allow
       "WebFetch": Deny
 
-# Pattern-based rules for dynamic worktree names
-# These apply when no exact worktree match is found
-patterns:
-  
-  # Dev branches: worktree_dev-*
-  - pattern: "^worktree_dev-.*"
+  # Chore/maintenance branches: chore/*, Documentation branches: docs/*
+  - branch_types: [chore, docs]
+    reason: "Maintenance and documentation branches allow non-code changes"
     permissions:
       "Write": Allow
-      "Edit": Allow  
+      "Edit": Allow
       "MultiEdit": Allow
       "Bash(git add:*)": Allow
       "Bash(git commit:*)": Allow
-      "Bash(git pull:*)": Allow
-      "Bash(npm:*)": Allow
-      "Bash(uv:*)": Allow
-      "Bash(gh pr:*)": Allow
-      "WebFetch": Ask
-      
-  # Feature branches: worktree_feat-*
-  - pattern: "^worktree_feat-.*"
-    permissions:
-      "Write": Allow
-      "Edit": Allow  
-      "MultiEdit": Allow
-      "Bash(git add:*)": Allow
-      "Bash(git commit:*)": Allow
-      "Bash(git pull:*)": Allow
-      "Bash(npm:*)": Allow
-      "Bash(uv:*)": Allow
-      "Bash(gh pr:*)": Allow
-      "WebFetch": Ask
-      
-  # Bugfix branches: worktree_bugfix-* or worktree_fix-*
-  - pattern: "^worktree_(bugfix|fix)-.*"
+      "Bash(git push:*)": Ask
+      "Bash(git push -f:*)": Deny
+      "Bash(gh pr:*)": Ask
+      "WebFetch": Ask            # May need to verify external links
+      "WebSearch": Ask
+
+  # Build system changes: build/*, CI/CD pipeline changes: ci/*
+  - branch_types: [build, ci]
+    reason: "Build and CI/CD branches modify infrastructure configuration"
     permissions:
       "Write": Allow
       "Edit": Allow
@@ -143,26 +200,58 @@ patterns:
       "Bash(git add:*)": Allow
       "Bash(git commit:*)": Allow
       "Bash(git push:*)": Ask
-      "WebFetch": Deny
-      
-  # Release branches: worktree_release-*
-  - pattern: "^worktree_release-.*"
+      "Bash(git push -f:*)": Deny
+      "Bash(npm:*)": Allow       # Build commands
+      "Bash(uv:*)": Allow
+      "WebFetch": Ask            # May need to fetch build configs
+
+  # Security-related changes: security/*
+  - branch_types: [security]
+    reason: "Security branch requires extra caution with all changes"
     permissions:
-      "Write": Ask
+      "Write": Ask               # Extra careful with security changes
       "Edit": Ask
       "MultiEdit": Ask
-      "Bash(git add:*)": Ask
-      "Bash(git commit:*)": Ask
+      "Bash(git add:*)": Allow
+      "Bash(git commit:*)": Allow
       "Bash(git push:*)": Ask
-      "WebFetch": Deny
-      
-  # Experimental branches: worktree_exp-* or worktree_experiment-*
-  - pattern: "^worktree_exp(eriment)?-.*"
+      "Bash(git push -f:*)": Deny
+      "Bash(gh pr:*)": Ask
+      "WebFetch": Deny           # No external fetches in security branches
+      "WebSearch": Deny
+
+  # Experimental branches: exp/*
+  - branch_types: [exp]
+    reason: "Experimental branch allows unrestricted exploration and testing"
     permissions:
       "Write": Allow
       "Edit": Allow
       "MultiEdit": Allow
       "Bash(git add:*)": Allow
       "Bash(git commit:*)": Allow
-      "Bash(git push:*)": Allow
-      "WebFetch": Allow
+      "Bash(git push:*)": Allow  # More permissive
+      "Bash(git push -f:*)": Ask # Allow but confirm
+      "Bash(npm:*)": Allow
+      "Bash(uv:*)": Allow
+      "WebFetch": Allow          # Experiments may need external data
+      "WebSearch": Allow
+
+# ============================================================================
+# FALLBACK FOR UNKNOWN BRANCH TYPES
+# ============================================================================
+# Applied when branch name doesn't match TYPE/name pattern
+# or when branch type is not recognized
+
+unknown_branch:
+  reason: "Unknown or unrecognized branch type, applying conservative permissions"
+  permissions:
+    "Read": Allow
+    "Write": Ask
+    "Edit": Ask
+    "MultiEdit": Ask
+    "Bash(git add:*)": Ask
+    "Bash(git commit:*)": Ask
+    "Bash(git push:*)": Deny
+    "Bash(git push -f:*)": Deny
+    "WebFetch": Deny
+    "WebSearch": Deny
