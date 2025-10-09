@@ -1,0 +1,34 @@
+{
+  "metadata": {
+    "test_id": "worktree_cd_outside_deny",
+    "hook_type": "PreToolUse",
+    "category": "worktree_permissions",
+    "description": "cd outside worktree boundary is denied",
+    "tags": [
+      "worktree",
+      "cd",
+      "boundary",
+      "deny"
+    ],
+    "priority": "critical",
+    "expected": {
+      "output_type": "json",
+      "json_output": {
+        "hookSpecificOutput.permissionDecision": "deny"
+      }
+    },
+    "created": "2025-10-08"
+  },
+  "payload": {
+    "session_id": "test-session-006",
+    "transcript_path": "test.jsonl",
+    "cwd": "/repo/worktrees/feat/new-feature",
+    "permission_mode": "acceptEdits",
+    "hook_event_name": "PreToolUse",
+    "tool_name": "Bash",
+    "tool_input": {
+      "command": "cd ../../main",
+      "description": "Navigate to main worktree"
+    }
+  }
+}

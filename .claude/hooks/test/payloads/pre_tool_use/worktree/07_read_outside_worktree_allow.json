@@ -1,0 +1,33 @@
+{
+  "metadata": {
+    "test_id": "worktree_read_outside_allow",
+    "hook_type": "PreToolUse",
+    "category": "worktree_permissions",
+    "description": "Read tool allowed outside worktree (always_allow)",
+    "tags": [
+      "worktree",
+      "read",
+      "boundary",
+      "allow"
+    ],
+    "priority": "high",
+    "expected": {
+      "output_type": "json",
+      "json_output": {
+        "hookSpecificOutput.permissionDecision": "allow"
+      }
+    },
+    "created": "2025-10-08"
+  },
+  "payload": {
+    "session_id": "test-session-007",
+    "transcript_path": "test.jsonl",
+    "cwd": "/repo/worktrees/feat/new-feature",
+    "permission_mode": "acceptEdits",
+    "hook_event_name": "PreToolUse",
+    "tool_name": "Read",
+    "tool_input": {
+      "file_path": "/repo/main/README.md"
+    }
+  }
+}

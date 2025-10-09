@@ -1,0 +1,34 @@
+{
+  "metadata": {
+    "test_id": "worktree_write_outside_deny",
+    "hook_type": "PreToolUse",
+    "category": "worktree_permissions",
+    "description": "Write tool denied outside worktree (boundary enforcement)",
+    "tags": [
+      "worktree",
+      "write",
+      "boundary",
+      "deny"
+    ],
+    "priority": "critical",
+    "expected": {
+      "output_type": "json",
+      "json_output": {
+        "hookSpecificOutput.permissionDecision": "deny"
+      }
+    },
+    "created": "2025-10-08"
+  },
+  "payload": {
+    "session_id": "test-session-008",
+    "transcript_path": "test.jsonl",
+    "cwd": "/repo/worktrees/feat/new-feature",
+    "permission_mode": "acceptEdits",
+    "hook_event_name": "PreToolUse",
+    "tool_name": "Write",
+    "tool_input": {
+      "file_path": "/repo/main/src/file.ts",
+      "content": "// This should be denied"
+    }
+  }
+}

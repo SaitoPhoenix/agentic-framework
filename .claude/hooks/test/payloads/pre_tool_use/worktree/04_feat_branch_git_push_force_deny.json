@@ -1,0 +1,33 @@
+{
+  "metadata": {
+    "test_id": "worktree_feat_git_push_force_deny",
+    "hook_type": "PreToolUse",
+    "category": "worktree_permissions",
+    "description": "Feature branch denies force push",
+    "tags": [
+      "worktree",
+      "feat",
+      "deny"
+    ],
+    "priority": "high",
+    "expected": {
+      "output_type": "json",
+      "json_output": {
+        "hookSpecificOutput.permissionDecision": "deny"
+      }
+    },
+    "created": "2025-10-08"
+  },
+  "payload": {
+    "session_id": "test-session-004",
+    "transcript_path": "test.jsonl",
+    "cwd": "/repo/worktrees/feat/new-feature",
+    "permission_mode": "acceptEdits",
+    "hook_event_name": "PreToolUse",
+    "tool_name": "Bash",
+    "tool_input": {
+      "command": "git push -f origin feat/new-feature",
+      "description": "Force push feature branch"
+    }
+  }
+}

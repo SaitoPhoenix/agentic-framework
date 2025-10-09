@@ -1,0 +1,33 @@
+{
+  "metadata": {
+    "test_id": "worktree_always_deny_sudo",
+    "hook_type": "PreToolUse",
+    "category": "worktree_permissions",
+    "description": "sudo is always denied (global always_deny)",
+    "tags": [
+      "worktree",
+      "always_deny",
+      "deny"
+    ],
+    "priority": "critical",
+    "expected": {
+      "output_type": "json",
+      "json_output": {
+        "hookSpecificOutput.permissionDecision": "deny"
+      }
+    },
+    "created": "2025-10-08"
+  },
+  "payload": {
+    "session_id": "test-session-016",
+    "transcript_path": "test.jsonl",
+    "cwd": "/repo/trees/exp/new-idea",
+    "permission_mode": "acceptEdits",
+    "hook_event_name": "PreToolUse",
+    "tool_name": "Bash",
+    "tool_input": {
+      "command": "sudo rm -rf /tmp/test",
+      "description": "Run sudo command"
+    }
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "metadata": {
+    "test_id": "worktree_test_commit_deny",
+    "hook_type": "PreToolUse",
+    "category": "worktree_permissions",
+    "description": "Test branch denies git commit",
+    "tags": [
+      "worktree",
+      "test",
+      "deny"
+    ],
+    "priority": "medium",
+    "expected": {
+      "output_type": "json",
+      "json_output": {
+        "hookSpecificOutput.permissionDecision": "deny"
+      }
+    },
+    "created": "2025-10-08"
+  },
+  "payload": {
+    "session_id": "test-session-011",
+    "transcript_path": "test.jsonl",
+    "cwd": "/repo/worktrees/test/integration",
+    "permission_mode": "acceptEdits",
+    "hook_event_name": "PreToolUse",
+    "tool_name": "Bash",
+    "tool_input": {
+      "command": "git commit -m 'test: add tests'",
+      "description": "Commit test changes"
+    }
+  }
+}

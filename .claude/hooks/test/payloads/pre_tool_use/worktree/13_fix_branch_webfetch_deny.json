@@ -1,0 +1,33 @@
+{
+  "metadata": {
+    "test_id": "worktree_fix_webfetch_deny",
+    "hook_type": "PreToolUse",
+    "category": "worktree_permissions",
+    "description": "Fix branch denies WebFetch",
+    "tags": [
+      "worktree",
+      "fix",
+      "deny"
+    ],
+    "priority": "medium",
+    "expected": {
+      "output_type": "json",
+      "json_output": {
+        "hookSpecificOutput.permissionDecision": "deny"
+      }
+    },
+    "created": "2025-10-08"
+  },
+  "payload": {
+    "session_id": "test-session-013",
+    "transcript_path": "test.jsonl",
+    "cwd": "/repo/worktrees/fix/bug-123",
+    "permission_mode": "acceptEdits",
+    "hook_event_name": "PreToolUse",
+    "tool_name": "WebFetch",
+    "tool_input": {
+      "url": "https://example.com/api",
+      "prompt": "Get API data"
+    }
+  }
+}

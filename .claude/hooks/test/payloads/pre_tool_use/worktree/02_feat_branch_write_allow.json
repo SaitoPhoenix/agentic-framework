@@ -1,0 +1,33 @@
+{
+  "metadata": {
+    "test_id": "worktree_feat_write_allow",
+    "hook_type": "PreToolUse",
+    "category": "worktree_permissions",
+    "description": "Feature branch allows Write tool",
+    "tags": [
+      "worktree",
+      "feat",
+      "allow"
+    ],
+    "priority": "high",
+    "expected": {
+      "output_type": "json",
+      "json_output": {
+        "hookSpecificOutput.permissionDecision": "allow"
+      }
+    },
+    "created": "2025-10-08"
+  },
+  "payload": {
+    "session_id": "test-session-002",
+    "transcript_path": "test.jsonl",
+    "cwd": "/repo/worktrees/feat/new-feature",
+    "permission_mode": "acceptEdits",
+    "hook_event_name": "PreToolUse",
+    "tool_name": "Write",
+    "tool_input": {
+      "file_path": "/repo/worktrees/feat/new-feature/src/component.tsx",
+      "content": "export const Component = () => {}"
+    }
+  }
+}

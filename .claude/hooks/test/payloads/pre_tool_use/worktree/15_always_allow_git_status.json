@@ -1,0 +1,33 @@
+{
+  "metadata": {
+    "test_id": "worktree_always_allow_git_status",
+    "hook_type": "PreToolUse",
+    "category": "worktree_permissions",
+    "description": "git status is always allowed (global always_allow)",
+    "tags": [
+      "worktree",
+      "always_allow",
+      "allow"
+    ],
+    "priority": "medium",
+    "expected": {
+      "output_type": "json",
+      "json_output": {
+        "hookSpecificOutput.permissionDecision": "allow"
+      }
+    },
+    "created": "2025-10-08"
+  },
+  "payload": {
+    "session_id": "test-session-015",
+    "transcript_path": "test.jsonl",
+    "cwd": "/repo/trees/test/integration",
+    "permission_mode": "acceptEdits",
+    "hook_event_name": "PreToolUse",
+    "tool_name": "Bash",
+    "tool_input": {
+      "command": "git status",
+      "description": "Check git status"
+    }
+  }
+}

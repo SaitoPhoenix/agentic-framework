@@ -1,0 +1,33 @@
+{
+  "metadata": {
+    "test_id": "worktree_exp_permissive",
+    "hook_type": "PreToolUse",
+    "category": "worktree_permissions",
+    "description": "Experimental branch allows git push",
+    "tags": [
+      "worktree",
+      "exp",
+      "allow"
+    ],
+    "priority": "medium",
+    "expected": {
+      "output_type": "json",
+      "json_output": {
+        "hookSpecificOutput.permissionDecision": "allow"
+      }
+    },
+    "created": "2025-10-08"
+  },
+  "payload": {
+    "session_id": "test-session-014",
+    "transcript_path": "test.jsonl",
+    "cwd": "/repo/trees/exp/new-idea",
+    "permission_mode": "acceptEdits",
+    "hook_event_name": "PreToolUse",
+    "tool_name": "Bash",
+    "tool_input": {
+      "command": "git push origin exp/new-idea",
+      "description": "Push experimental branch"
+    }
+  }
+}

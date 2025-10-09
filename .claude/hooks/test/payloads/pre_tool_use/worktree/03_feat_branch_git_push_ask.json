@@ -1,0 +1,33 @@
+{
+  "metadata": {
+    "test_id": "worktree_feat_git_push_ask",
+    "hook_type": "PreToolUse",
+    "category": "worktree_permissions",
+    "description": "Feature branch requires confirmation for git push",
+    "tags": [
+      "worktree",
+      "feat",
+      "ask"
+    ],
+    "priority": "high",
+    "expected": {
+      "output_type": "json",
+      "json_output": {
+        "hookSpecificOutput.permissionDecision": "ask"
+      }
+    },
+    "created": "2025-10-08"
+  },
+  "payload": {
+    "session_id": "test-session-003",
+    "transcript_path": "test.jsonl",
+    "cwd": "/repo/worktrees/feat/new-feature",
+    "permission_mode": "acceptEdits",
+    "hook_event_name": "PreToolUse",
+    "tool_name": "Bash",
+    "tool_input": {
+      "command": "git push origin feat/new-feature",
+      "description": "Push feature branch"
+    }
+  }
+}

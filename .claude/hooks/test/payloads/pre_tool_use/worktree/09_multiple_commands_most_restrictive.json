@@ -1,0 +1,34 @@
+{
+  "metadata": {
+    "test_id": "worktree_multiple_commands_restrictive",
+    "hook_type": "PreToolUse",
+    "category": "worktree_permissions",
+    "description": "Multiple commands return most restrictive permission (ask)",
+    "tags": [
+      "worktree",
+      "feat",
+      "multiple",
+      "ask"
+    ],
+    "priority": "high",
+    "expected": {
+      "output_type": "json",
+      "json_output": {
+        "hookSpecificOutput.permissionDecision": "ask"
+      }
+    },
+    "created": "2025-10-08"
+  },
+  "payload": {
+    "session_id": "test-session-009",
+    "transcript_path": "test.jsonl",
+    "cwd": "/repo/worktrees/feat/new-feature",
+    "permission_mode": "acceptEdits",
+    "hook_event_name": "PreToolUse",
+    "tool_name": "Bash",
+    "tool_input": {
+      "command": "git add . && git commit -m 'feat: new feature' && git push",
+      "description": "Add, commit, and push changes"
+    }
+  }
+}

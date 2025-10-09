@@ -1,0 +1,34 @@
+{
+  "metadata": {
+    "test_id": "worktree_cd_within_allow",
+    "hook_type": "PreToolUse",
+    "category": "worktree_permissions",
+    "description": "cd within worktree boundary is allowed",
+    "tags": [
+      "worktree",
+      "cd",
+      "boundary",
+      "allow"
+    ],
+    "priority": "critical",
+    "expected": {
+      "output_type": "json",
+      "json_output": {
+        "hookSpecificOutput.permissionDecision": "allow"
+      }
+    },
+    "created": "2025-10-08"
+  },
+  "payload": {
+    "session_id": "test-session-005",
+    "transcript_path": "test.jsonl",
+    "cwd": "/repo/worktrees/feat/new-feature",
+    "permission_mode": "acceptEdits",
+    "hook_event_name": "PreToolUse",
+    "tool_name": "Bash",
+    "tool_input": {
+      "command": "cd src/components",
+      "description": "Navigate to components directory"
+    }
+  }
+}

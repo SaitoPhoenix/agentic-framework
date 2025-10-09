@@ -1,0 +1,31 @@
+{
+  "metadata": {
+    "test_id": "worktree_main_disabled",
+    "hook_type": "PreToolUse",
+    "category": "worktree_permissions",
+    "description": "Main worktree with enabled=false should ignore (pass through)",
+    "tags": [
+      "worktree",
+      "main",
+      "ignore"
+    ],
+    "priority": "high",
+    "expected": {
+      "output_type": "exitcode",
+      "exit_code": 0
+    },
+    "created": "2025-10-08"
+  },
+  "payload": {
+    "session_id": "test-session-001",
+    "transcript_path": "test.jsonl",
+    "cwd": "/mnt/e/DataAlchemy/Repositories/agentic-framework",
+    "permission_mode": "acceptEdits",
+    "hook_event_name": "PreToolUse",
+    "tool_name": "Write",
+    "tool_input": {
+      "file_path": "/mnt/e/DataAlchemy/Repositories/agentic-framework/test.txt",
+      "content": "test"
+    }
+  }
+}
