@@ -5,7 +5,7 @@ aliases:
   - worktree_permissions
   - git worktree permissions
 entity_classification: technology/task
-status: new
+status: review-needed
 created: 2025-10-08T00:00:00Z
 last_updated: 2025-10-08T00:00:00Z
 source_episodes:
