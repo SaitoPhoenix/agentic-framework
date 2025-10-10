@@ -11,8 +11,12 @@
     ],
     "priority": "high",
     "expected": {
-      "output_type": "exitcode",
-      "exit_code": 0
+      "output_type": "json",
+      "json_output": {
+        "hookSpecificOutput.permissionDecision": {
+          "absent": true
+        }
+      }
     },
     "created": "2025-10-08"
   },

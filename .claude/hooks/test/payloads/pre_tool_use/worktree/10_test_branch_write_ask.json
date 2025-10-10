@@ -13,7 +13,10 @@
     "expected": {
       "output_type": "json",
       "json_output": {
-        "hookSpecificOutput.permissionDecision": "ask"
+        "hookSpecificOutput.permissionDecision": "ask",
+        "hookSpecificOutput.permissionDecisionReason": {
+          "exact": "[Write] Worktree Permissions: Testing branch restricted to running tests, not making code changes"
+        }
       }
     },
     "created": "2025-10-08"
@@ -21,12 +24,12 @@
   "payload": {
     "session_id": "test-session-010",
     "transcript_path": "test.jsonl",
-    "cwd": "/repo/worktrees/test/integration",
+    "cwd": "/mnt/e/DataAlchemy/Repositories/agentic-framework/trees/test/permission-test",
     "permission_mode": "acceptEdits",
     "hook_event_name": "PreToolUse",
     "tool_name": "Write",
     "tool_input": {
-      "file_path": "/repo/worktrees/test/integration/tests/test_api.py",
+      "file_path": "/mnt/e/DataAlchemy/Repositories/agentic-framework/trees/test/permission-test/tests/test_api.py",
       "content": "def test_api(): pass"
     }
   }

@@ -14,7 +14,10 @@
     "expected": {
       "output_type": "json",
       "json_output": {
-        "hookSpecificOutput.permissionDecision": "ask"
+        "hookSpecificOutput.permissionDecision": "ask",
+        "hookSpecificOutput.permissionDecisionReason": {
+          "exact": "[Bash(git push:*)] Worktree Permissions: Feature branch allows collaborative development with safeguards"
+        }
       }
     },
     "created": "2025-10-08"
@@ -22,7 +25,7 @@
   "payload": {
     "session_id": "test-session-009",
     "transcript_path": "test.jsonl",
-    "cwd": "/repo/worktrees/feat/new-feature",
+    "cwd": "/mnt/e/DataAlchemy/Repositories/agentic-framework/trees/feat/permission-test",
     "permission_mode": "acceptEdits",
     "hook_event_name": "PreToolUse",
     "tool_name": "Bash",

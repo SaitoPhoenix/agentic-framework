@@ -13,7 +13,10 @@
     "expected": {
       "output_type": "json",
       "json_output": {
-        "hookSpecificOutput.permissionDecision": "allow"
+        "hookSpecificOutput.permissionDecision": "allow",
+        "hookSpecificOutput.permissionDecisionReason": {
+          "exact": "[Bash(git push:*)] Worktree Permissions: Experimental branch allows unrestricted exploration and testing"
+        }
       }
     },
     "created": "2025-10-08"
@@ -21,7 +24,7 @@
   "payload": {
     "session_id": "test-session-014",
     "transcript_path": "test.jsonl",
-    "cwd": "/repo/trees/exp/new-idea",
+    "cwd": "/mnt/e/DataAlchemy/Repositories/agentic-framework/trees/exp/permission-test",
     "permission_mode": "acceptEdits",
     "hook_event_name": "PreToolUse",
     "tool_name": "Bash",
