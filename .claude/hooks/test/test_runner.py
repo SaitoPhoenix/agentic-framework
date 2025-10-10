@@ -440,9 +440,33 @@ class UniversalTestRunner:
         Match actual value against pattern specification
 
         Pattern can be:
-        - Dict with 'exact', 'contains', or 'regex' key
+        - Dict with 'exact', 'contains', 'regex', or 'absent' key
         - String for exact match
         """
+        # If pattern is a dict, check for matching type
+        if isinstance(pattern, dict):
+            # Check for absence validation
+            if 'absent' in pattern:
+                # If absent: true, the field should be None/missing
+                # If absent: false, the field should exist
+                should_be_absent = pattern['absent']
+                is_absent = actual is None
+                return is_absent if should_be_absent else not is_absent
+
+            # For other validations, None means failure
+            if actual is None:
+                return False
+
+            actual_str = str(actual)
+
+            if 'exact' in pattern:
+                return actual_str == pattern['exact']
+            elif 'contains' in pattern:
+                return pattern['contains'] in actual_str
+            elif 'regex' in pattern:
+                return bool(re.search(pattern['regex'], actual_str))
+
+        # If actual is None and no absent check, fail
         if actual is None:
             return False
 
@@ -451,15 +475,6 @@ class UniversalTestRunner:
         # If pattern is a string, do exact match
         if isinstance(pattern, str):
             return actual_str == pattern
-
-        # If pattern is a dict, check for matching type
-        if isinstance(pattern, dict):
-            if 'exact' in pattern:
-                return actual_str == pattern['exact']
-            elif 'contains' in pattern:
-                return pattern['contains'] in actual_str
-            elif 'regex' in pattern:
-                return bool(re.search(pattern['regex'], actual_str))
 
         return False
 
