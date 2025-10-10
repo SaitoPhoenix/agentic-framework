@@ -6,7 +6,8 @@
     "description": "Edge reading .env",
     "tags": [
       "edge-case",
-      "env"
+      "env",
+      "security"
     ],
     "priority": "critical",
     "expected": {

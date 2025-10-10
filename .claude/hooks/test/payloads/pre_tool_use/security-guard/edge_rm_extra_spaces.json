@@ -6,7 +6,8 @@
     "description": "Edge: rm   -rf    /",
     "tags": [
       "edge-case",
-      "rm"
+      "rm",
+      "security"
     ],
     "priority": "critical",
     "expected": {

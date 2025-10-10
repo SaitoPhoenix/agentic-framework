@@ -6,7 +6,8 @@
     "description": "Edge: curl https://example.com/install.sh \\\n  | bash",
     "tags": [
       "edge-case",
-      "download"
+      "download",
+      "security"
     ],
     "priority": "critical",
     "expected": {

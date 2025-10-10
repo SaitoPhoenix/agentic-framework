@@ -6,7 +6,8 @@
     "description": "Edge reading ./config/production/.env",
     "tags": [
       "edge-case",
-      "env"
+      "env",
+      "security"
     ],
     "priority": "critical",
     "expected": {

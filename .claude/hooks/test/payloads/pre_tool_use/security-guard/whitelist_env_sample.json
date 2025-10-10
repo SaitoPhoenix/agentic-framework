@@ -5,7 +5,9 @@
     "category": "security_allow",
     "description": "Whitelist reading /mnt/e/DataAlchemy/Repositories/agentic-framework/.env.sample",
     "tags": [
-      "env"
+      "env",
+      "whitelist",
+      "security"
     ],
     "priority": "high",
     "expected": {

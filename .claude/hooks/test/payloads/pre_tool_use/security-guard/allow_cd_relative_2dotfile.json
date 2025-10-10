@@ -1,17 +1,21 @@
 {
   "metadata": {
-    "test_id": "allow_cd_2dotfile",
+    "test_id": "allow_cd_relative_2dotfile",
     "hook_type": "PreToolUse",
     "category": "security_allow",
-    "description": "Allow: cd dir-a/ && cat file..txt",
+    "description": "Allow: cd dir-a/ && cat file..txt (should pass through security guard)",
     "tags": [
       "security",
       "cd"
     ],
     "priority": "medium",
     "expected": {
-      "output_type": "exitcode",
-      "exit_code": 0
+      "output_type": "json",
+      "json_output": {
+        "hookSpecificOutput.permissionDecision": {
+          "absent": true
+        }
+      }
     },
     "created": "2025-10-08"
   },

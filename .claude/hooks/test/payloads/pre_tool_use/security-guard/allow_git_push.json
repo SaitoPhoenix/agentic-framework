@@ -1,18 +1,21 @@
 {
   "metadata": {
-    "test_id": "edge_rm_safe_specific",
+    "test_id": "allow_git_push",
     "hook_type": "PreToolUse",
-    "category": "edge_cases",
-    "description": "Edge: rm -rf /tmp/specific_build_dir",
+    "category": "security_allow",
+    "description": "Allow: git push origin feat/new-feature (should pass through security guard)",
     "tags": [
-      "edge-case",
-      "rm",
-      "security"
+      "security",
+      "git"
     ],
-    "priority": "critical",
+    "priority": "high",
     "expected": {
-      "output_type": "exitcode",
-      "exit_code": 0
+      "output_type": "json",
+      "json_output": {
+        "hookSpecificOutput.permissionDecision": {
+          "absent": true
+        }
+      }
     },
     "created": "2025-10-07"
   },
@@ -24,8 +27,8 @@
     "hook_event_name": "PreToolUse",
     "tool_name": "Bash",
     "tool_input": {
-      "command": "rm -rf /tmp/specific_build_dir",
-      "description": "Safe specific rm -rf"
+      "command": "git push origin feat/new-feature",
+      "description": "Push feature branch"
     }
   }
 }
