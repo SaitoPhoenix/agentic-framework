@@ -8,8 +8,8 @@ argument-hint: [user_name] [agent_name]
 ## Variables
 
 - **SEMANTIC_MEMORY_PATH**: .claude/agent-docs/memory/semantic/
-- **CURRENT_USER**: The name of the current user ($1 | inferred | none)
-- **CURRENT_AGENT**: The name of the current agent ($2 | inferred | none)
+- **CURRENT_USER**: The name of the current user ($1 | Saito)
+- **CURRENT_AGENT**: The name of the current agent ($2 | Yuki)
 
 ## Workflow
 1. *Run:* `eza --tree $SEMANTIC_MEMORY_PATH` to list your semantic memories
