@@ -24,18 +24,28 @@ def detect_worktree_context(cwd: str) -> Optional[WorktreeContext]:
     Detect if current working directory is in a git worktree and extract context.
 
     Detection logic:
-    1. Run `git worktree list --porcelain` to get all worktrees
-    2. Check if cwd starts with any worktree path
-    3. Extract branch name and type from matched worktree
-    4. Determine if it's main or linked worktree
+    1. Validate that cwd exists
+    2. Run `git worktree list --porcelain` to get all worktrees
+    3. Check if cwd starts with any worktree path
+    4. Extract branch name and type from matched worktree
+    5. Determine if it's main or linked worktree
 
     Args:
         cwd: Current working directory from hook input
 
     Returns:
         WorktreeContext if in a git worktree, None otherwise
+        Returns None if cwd doesn't exist or any error occurs
     """
     try:
+        # Validate that cwd exists
+        cwd_path = Path(cwd)
+        if not cwd_path.exists():
+            # Return None, let caller handle error reporting
+            return None
+        if not cwd_path.is_dir():
+            # Return None, let caller handle error reporting
+            return None
         # Run git worktree list --porcelain
         result = subprocess.run(
             ["git", "worktree", "list", "--porcelain"],
@@ -53,29 +63,43 @@ def detect_worktree_context(cwd: str) -> Optional[WorktreeContext]:
         worktrees = parse_worktree_list(result.stdout)
 
         # Find which worktree contains cwd
+        # Match the most specific worktree path (longest matching path)
         cwd_path = Path(cwd).resolve()
+        best_match = None
+        best_match_index = -1
+        best_match_length = 0
 
-        for worktree in worktrees:
+        for index, worktree in enumerate(worktrees):
             worktree_path = Path(worktree["path"]).resolve()
 
             # Check if cwd starts with worktree path
             try:
                 cwd_path.relative_to(worktree_path)
                 # cwd is within this worktree
-                is_main = worktree.get("main", False)
-                branch_name = worktree.get("branch")
-                branch_type = extract_branch_type(branch_name) if branch_name else None
-
-                return WorktreeContext(
-                    is_worktree=True,
-                    is_main=is_main,
-                    worktree_root=str(worktree_path),
-                    branch_name=branch_name,
-                    branch_type=branch_type
-                )
+                # Keep track of the longest matching path (most specific)
+                path_length = len(str(worktree_path))
+                if path_length > best_match_length:
+                    best_match = worktree
+                    best_match_index = index
+                    best_match_length = path_length
             except ValueError:
                 # cwd is not under this worktree, continue
                 continue
+
+        if best_match:
+            # First worktree in list is always the main worktree
+            is_main = (best_match_index == 0)
+            branch_name = best_match.get("branch")
+            branch_type = extract_branch_type(branch_name) if branch_name else None
+            worktree_path = Path(best_match["path"]).resolve()
+
+            return WorktreeContext(
+                is_worktree=True,
+                is_main=is_main,
+                worktree_root=str(worktree_path),
+                branch_name=branch_name,
+                branch_type=branch_type
+            )
 
         # cwd not in any worktree (shouldn't happen if git command succeeded)
         return None
@@ -135,12 +159,6 @@ def parse_worktree_list(output: str) -> list[dict]:
     # Add last worktree
     if current_worktree:
         worktrees.append(current_worktree)
-
-    # Mark the first worktree as main (it's always the main working tree)
-    if worktrees:
-        worktrees[0]['main'] = True
-        for wt in worktrees[1:]:
-            wt['main'] = False
 
     return worktrees
 

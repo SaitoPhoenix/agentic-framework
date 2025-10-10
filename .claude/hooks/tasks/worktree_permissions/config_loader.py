@@ -9,6 +9,12 @@ from typing import Dict, Any, List, Optional
 from pydantic import BaseModel, Field, field_validator
 
 
+class AlwaysDenyRule(BaseModel):
+    """Always deny rule with pattern and reason"""
+    pattern: str
+    reason: str
+
+
 class GlobalConfig(BaseModel):
     """Global configuration settings"""
     enabled: bool = True
@@ -16,7 +22,7 @@ class GlobalConfig(BaseModel):
     log_permissions: bool = True
     enforce_boundaries: bool = True
     always_allow: List[str] = Field(default_factory=list)
-    always_deny: List[str] = Field(default_factory=list)
+    always_deny: List[Any] = Field(default_factory=list)  # Can be string or dict
 
     @field_validator('default_permission')
     @classmethod
@@ -26,6 +32,33 @@ class GlobalConfig(BaseModel):
         if v_lower not in {"allow", "ask", "deny", "ignore"}:
             raise ValueError(f"Invalid permission '{v}'. Must be one of: allow, ask, deny, ignore")
         return v_lower
+
+    @field_validator('always_deny')
+    @classmethod
+    def normalize_always_deny(cls, v: List[Any]) -> List[AlwaysDenyRule]:
+        """
+        Normalize always_deny to list of AlwaysDenyRule objects.
+        Supports both old format (strings) and new format (dict with pattern and reason).
+        """
+        rules = []
+        for item in v:
+            if isinstance(item, str):
+                # Old format: just a pattern string, use default reason
+                rules.append(AlwaysDenyRule(
+                    pattern=item,
+                    reason="Tool denied by always_deny rule"
+                ))
+            elif isinstance(item, dict):
+                # New format: dict with pattern and reason
+                if 'pattern' not in item:
+                    raise ValueError("always_deny dict must have 'pattern' field")
+                rules.append(AlwaysDenyRule(
+                    pattern=item['pattern'],
+                    reason=item.get('reason', "Tool denied by always_deny rule")
+                ))
+            else:
+                raise ValueError(f"always_deny items must be strings or dicts, got {type(item)}")
+        return rules
 
 
 class MainWorktreeConfig(BaseModel):

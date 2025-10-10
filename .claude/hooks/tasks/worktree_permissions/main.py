@@ -65,6 +65,18 @@ def check_permissions(
                 return {"systemMessage": "No tool to check, passing through"}
             return None
 
+        # Validate cwd exists
+        from pathlib import Path
+        cwd_path = Path(cwd)
+        if not cwd_path.exists():
+            if show_errors:
+                return {"systemMessage": f"Worktree permissions: Current working directory does not exist: {cwd}"}
+            return None
+        if not cwd_path.is_dir():
+            if show_errors:
+                return {"systemMessage": f"Worktree permissions: Current working directory is not a directory: {cwd}"}
+            return None
+
         # Detect worktree context
         context = detect_worktree_context(cwd)
 
@@ -139,7 +151,7 @@ def create_permission_response(
         "hookSpecificOutput": {
             "hookEventName": "PreToolUse",
             "permissionDecision": decision,
-            "permissionDecisionReason": f"Worktree permissions: {reason}"
+            "permissionDecisionReason": reason
         }
     }
 
