@@ -94,7 +94,7 @@ blacklist:
 
       # Prevent relative path directory traversal
       - command: "cd"
-        patterns: ['\.\.']
+        patterns: ['(^|\s|/|d)\.\.($|\s|/|\\)']
         message: "Relative path directory traversal is blocked"
 
       # Dangerous rm commands
