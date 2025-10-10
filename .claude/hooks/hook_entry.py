@@ -80,9 +80,9 @@ def combine_task_responses(task_responses):
             )
             system_messages.append(formatted_message)
 
-        # Collect hookSpecificOutput
+        # Collect hookSpecificOutput with task name for tracking
         if "hookSpecificOutput" in response:
-            hook_specific_outputs.append(response["hookSpecificOutput"])
+            hook_specific_outputs.append((task_name, response["hookSpecificOutput"]))
 
     # Set defaults if not set by any task
     if "continue" not in combined:
@@ -94,16 +94,69 @@ def combine_task_responses(task_responses):
     if system_messages:
         combined["systemMessage"] = "\n\n".join(system_messages)
 
-    # Rule: Only one task can return hookSpecificOutput
-    if len(hook_specific_outputs) > 1:
-        combined["continue"] = False
-        combined["stopReason"] = (
-            "Multiple tasks are returning hook specific output.  Should only be one."
+    # Rule: For permission decisions, use the most restrictive one
+    # Priority: deny > ask > allow
+    if hook_specific_outputs:
+        most_restrictive_output = _get_most_restrictive_permission_decision(
+            hook_specific_outputs
         )
-    elif len(hook_specific_outputs) == 1:
-        combined["hookSpecificOutput"] = hook_specific_outputs[0]
+        if most_restrictive_output:
+            combined["hookSpecificOutput"] = most_restrictive_output
 
     return combined
+
+
+def _get_most_restrictive_permission_decision(hook_specific_outputs):
+    """
+    Get the most restrictive permission decision from multiple hookSpecificOutputs.
+
+    For PreToolUse hooks:
+    - Priority: deny > ask > allow
+    - For ties (multiple tasks with same priority), the last one wins
+    - Returns the most restrictive permissionDecision with its reason
+
+    For other hook types (PostToolUse, UserPromptSubmit, SessionStart):
+    - Returns the first hookSpecificOutput found
+
+    Args:
+        hook_specific_outputs: List of tuples (task_name, hookSpecificOutput_dict)
+
+    Returns:
+        Most restrictive hookSpecificOutput dict or None
+    """
+    if not hook_specific_outputs:
+        return None
+
+    # Check if this is a PreToolUse hook by looking for permissionDecision
+    pre_tool_use_outputs = [
+        (task_name, output)
+        for task_name, output in hook_specific_outputs
+        if isinstance(output, dict)
+        and output.get("hookEventName") == "PreToolUse"
+        and "permissionDecision" in output
+    ]
+
+    if pre_tool_use_outputs:
+        # Handle PreToolUse permission decisions with priority
+        permission_priority = {"deny": 3, "ask": 2, "allow": 1}
+
+        most_restrictive = None
+        highest_priority = 0
+
+        for _task_name, output in pre_tool_use_outputs:
+            decision = output.get("permissionDecision", "")
+            priority = permission_priority.get(decision, 0)
+
+            # Use >= to make last one win in case of ties
+            if priority >= highest_priority:
+                highest_priority = priority
+                most_restrictive = output
+
+        return most_restrictive
+
+    # For non-PreToolUse hooks, return the first one
+    # (original behavior: only one should exist)
+    return hook_specific_outputs[0][1] if hook_specific_outputs else None
 
 
 def main(hook_name):
