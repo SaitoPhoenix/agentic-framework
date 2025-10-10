@@ -192,9 +192,12 @@ def has_dangerous_flags(command: str, dangerous_flags: List[List[str]]) -> bool:
     Returns:
         True if any dangerous flag combination is present
     """
+    # Split command into tokens for word-boundary matching
+    tokens = command.split()
+
     for flag_combo in dangerous_flags:
-        # Check if all flags in combination are present
-        if all(flag.lower() in command for flag in flag_combo):
+        # Check if all flags in combination are present as whole tokens
+        if all(flag.lower() in tokens for flag in flag_combo):
             return True
     return False
 
