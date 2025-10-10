@@ -51,18 +51,19 @@ global:
     - "Bash(mkdir:*)"             # Create directories
     - "Bash(grep:*)"              # Search text
     - "Bash(eza:*)"                # List files
+    - "Bash(npm:*)"                # Node package manager
+    - "Bash(uv:*)"                # Python package manager
 
 
   # Tools that are ALWAYS denied in worktrees (security)
   always_deny:
-    - pattern: "Bash(rm -rf /:*)"
-      reason: "Recursive delete from root is dangerous"
     - pattern: "Bash(sudo:*)"
       reason: "Tool denied by always_deny rule"
     - pattern: "Bash(su:*)"
       reason: "Switch user commands not allowed"
-    - pattern: "Bash(chmod 777:*)"
-      reason: "Overly permissive file permissions not allowed"
+    - pattern: "Bash(dd:*)"
+      reason: "dd command is dangerous"
+            
 
 # ============================================================================
 # SPECIAL: cd COMMAND HANDLING
@@ -90,7 +91,6 @@ main_worktree:
     "Edit": Ask
     "MultiEdit": Ask
     "Bash(git push:*)": Ask
-    "Bash(git push -f:*)": Deny
     "WebFetch": Ask
 
 # ============================================================================
@@ -125,10 +125,7 @@ branch_permissions:
       "Bash(git add:*)": Allow
       "Bash(git commit:*)": Allow
       "Bash(git push:*)": Ask    # Confirm before pushing
-      "Bash(git push -f:*)": Deny # Never force push
       "Bash(gh pr:*)": Allow     # GitHub PR commands
-      "Bash(npm:*)": Allow
-      "Bash(uv:*)": Allow
       "WebFetch": Ask
       "WebSearch": Ask
 
@@ -139,14 +136,11 @@ branch_permissions:
       "Read": Allow
       "Write": Allow
       "Edit": Allow
-      "MultiEdit": Ask
+      "MultiEdit": Allow
       "Bash(git add:*)": Allow
       "Bash(git commit:*)": Allow
       "Bash(git push:*)": Ask
-      "Bash(git push -f:*)": Deny
       "Bash(gh pr:*)": Allow
-      "Bash(npm:*)": Allow
-      "Bash(uv:*)": Allow
       "WebFetch": Deny           # No external fetches for fixes
 
   # Refactoring branches: refactor/*, Performance optimization branches: perf/*
@@ -159,10 +153,7 @@ branch_permissions:
       "Bash(git add:*)": Allow
       "Bash(git commit:*)": Allow
       "Bash(git push:*)": Ask
-      "Bash(git push -f:*)": Deny
       "Bash(gh pr:*)": Ask
-      "Bash(npm:*)": Allow
-      "Bash(uv:*)": Allow
       "WebFetch": Deny
 
   # Testing branches: test/*
@@ -174,9 +165,6 @@ branch_permissions:
       "MultiEdit": Deny
       "Bash(git add:*)": Deny    # Usually don't commit from test branches
       "Bash(git commit:*)": Deny
-      "Bash(npm test:*)": Allow  # Run tests
-      "Bash(uv run pytest:*)": Allow
-      "Bash(uv run python:*)": Allow
       "WebFetch": Deny
 
   # Chore/maintenance branches: chore/*, Documentation branches: docs/*
@@ -189,7 +177,6 @@ branch_permissions:
       "Bash(git add:*)": Allow
       "Bash(git commit:*)": Allow
       "Bash(git push:*)": Ask
-      "Bash(git push -f:*)": Deny
       "Bash(gh pr:*)": Ask
       "WebFetch": Ask            # May need to verify external links
       "WebSearch": Ask
@@ -204,9 +191,6 @@ branch_permissions:
       "Bash(git add:*)": Allow
       "Bash(git commit:*)": Allow
       "Bash(git push:*)": Ask
-      "Bash(git push -f:*)": Deny
-      "Bash(npm:*)": Allow       # Build commands
-      "Bash(uv:*)": Allow
       "WebFetch": Ask            # May need to fetch build configs
 
   # Security-related changes: security/*
@@ -219,7 +203,6 @@ branch_permissions:
       "Bash(git add:*)": Allow
       "Bash(git commit:*)": Allow
       "Bash(git push:*)": Ask
-      "Bash(git push -f:*)": Deny
       "Bash(gh pr:*)": Ask
       "WebFetch": Deny           # No external fetches in security branches
       "WebSearch": Deny
@@ -234,9 +217,6 @@ branch_permissions:
       "Bash(git add:*)": Allow
       "Bash(git commit:*)": Allow
       "Bash(git push:*)": Allow  # More permissive
-      "Bash(git push -f:*)": Ask # Allow but confirm
-      "Bash(npm:*)": Allow
-      "Bash(uv:*)": Allow
       "WebFetch": Allow          # Experiments may need external data
       "WebSearch": Allow
 
@@ -256,6 +236,5 @@ unknown_branch:
     "Bash(git add:*)": Ask
     "Bash(git commit:*)": Ask
     "Bash(git push:*)": Deny
-    "Bash(git push -f:*)": Deny
     "WebFetch": Deny
     "WebSearch": Deny
