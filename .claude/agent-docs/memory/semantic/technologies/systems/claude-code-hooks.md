@@ -5,13 +5,14 @@ aliases:
   - Claude Code hooks
   - hook system
 entity_classification: technology/system
-status: active
+status: updated
 created: 2025-10-04T21:14:00Z
-last_updated: 2025-10-08T00:00:00Z
+last_updated: 2025-10-13T17:50:00Z
 source_episodes:
   - 251003_EP_7
   - 251006_EP_2
   - 251008_EP_7
+  - 251013_EP_1
 summary: A modular task-based system for extending Claude Code functionality through configurable hooks that execute at specific lifecycle events
 ambiguities: []
 relationships:
@@ -35,6 +36,11 @@ relationships:
     description: Worktree permissions is a task component for workspace isolation
     role: parent system
     source: 251008_EP_7
+  - type: contains
+    entity: multi-agent-observability
+    description: Multi-agent observability is a task component for event monitoring
+    role: parent system
+    source: 251013_EP_1
   - type: uses
     entity: pathspec
     description: Uses pathspec library for pattern matching in security tasks
@@ -52,13 +58,18 @@ relationships:
 - Tasks are located under .claude/hooks/tasks/ directory [251003_EP_7]
 - Multiple tasks can run on the same hook with ordered execution [251008_EP_7]
 - Tasks can return permissionDecision to control tool execution [251008_EP_7]
+- Tasks should be disabled during development to prevent execution errors [251013_EP_1]
 
 ### Available Hooks
 - session_start: Fires when a session begins [251003_EP_7]
+- session_end: Fires when a session ends [251013_EP_1]
 - user_prompt_submit: Fires when user submits a prompt [251003_EP_7]
 - pre_tool_use: Fires before a tool is executed [251003_EP_7]
 - post_tool_use: Fires after a tool completes [251003_EP_7]
 - stop: Fires when conversation ends [251003_EP_7]
+- notification: Fires for system notifications [251013_EP_1]
+- subagent_stop: Fires when a subagent stops [251013_EP_1]
+- pre_compact: Fires before context compaction [251013_EP_1]
 
 ### Task Components
 - log_hook: Logs hook input data to JSON files [251003_EP_7]
@@ -67,6 +78,7 @@ relationships:
 - cleanup_subprocesses: Terminates running subprocesses [251003_EP_7]
 - security_guard: Validates and blocks dangerous operations [251003_EP_7]
 - worktree_permissions: Manages tool permissions based on git worktree context [251008_EP_7]
+- multi_agent_observability: Sends events to observability server for monitoring [251013_EP_1]
 
 ### Configuration System
 - Each task has module, function, and config properties [251003_EP_7]
@@ -75,6 +87,7 @@ relationships:
 - Documentation maintained in .claude/hooks/config/README.md [251003_EP_7]
 - Task execution order matters for pre_tool_use hook [251008_EP_7]
 - worktree_permissions runs before security_guard for two-layer security [251008_EP_7]
+- Optional parameters should have sensible defaults to minimize config verbosity [251013_EP_1]
 
 ### Testing Infrastructure
 - Comprehensive test framework located in .claude/hooks/test/ [251006_EP_2]
@@ -91,6 +104,12 @@ relationships:
 - Most restrictive permission wins: deny > ask > allow [251008_EP_7]
 - ignore decision means task passes through without opinion [251008_EP_7]
 - Reason field explains permission decisions to users [251008_EP_7]
+
+### Hook Input Data Structure
+- hook_event_name: Contains the name of the hook type [251013_EP_1]
+- session_id: Unique identifier for the current session [251013_EP_1]
+- payload: Contains hook-specific data [251013_EP_1]
+- Documented in anthropic_hooks.md reference documentation [251013_EP_1]
 
 ## Requirements
 
@@ -138,6 +157,13 @@ relationships:
   - **Rationale:** Never block legitimate operations due to bugs or errors
   - **Impact:** Tasks return None on error, allowing operation to proceed
 
+- **Centralized configuration in hooks_config.yaml** [251013_EP_1]
+  - **Category:** Configuration Management
+  - **Status:** Final
+  - **Created:** 2025-10-13
+  - **Rationale:** Avoids proliferation of configuration files, keeps settings centralized
+  - **Impact:** All task configuration in one file rather than separate task-specific files
+
 ## Accomplishments
 
 ### Testing Infrastructure
@@ -154,6 +180,12 @@ relationships:
 - Created comprehensive worktree-permissions.yaml configuration [251008_EP_7]
 - Documented worktree permissions in hooks system README [251008_EP_7]
 
+### Multi-Agent Observability Integration
+- Integrated multi_agent_observability task across all 9 hook types [251013_EP_1]
+- Configured appropriate event handling per hook type [251013_EP_1]
+- Created event_summary.j2 template for LLM summarization [251013_EP_1]
+- Updated hooks config README with task documentation [251013_EP_1]
+
 ## Approaches
 
 ### Error Handling
@@ -167,6 +199,7 @@ relationships:
 - Task documentation includes purpose, use cases, and configuration [251003_EP_7]
 - Examples provided for common scenarios [251003_EP_7]
 - Troubleshooting section for common issues [251003_EP_7]
+- Configuration options documented with defaults and requirements [251013_EP_1]
 
 ### Testing Strategy
 - Comprehensive test coverage with multiple categories [251006_EP_2]
@@ -181,6 +214,12 @@ relationships:
 - Tasks can opt out of decision-making with ignore [251008_EP_7]
 - Reason strings provide transparency for permission decisions [251008_EP_7]
 
+### Configuration Management
+- Optional parameters with sensible defaults [251013_EP_1]
+- Minimal required configuration [251013_EP_1]
+- False boolean defaults can be omitted [251013_EP_1]
+- Interdependent validation (e.g., message_pattern required when summarize is true) [251013_EP_1]
+
 ## Philosophies
 
 ### Workspace Isolation
@@ -192,3 +231,8 @@ relationships:
 - Defense in depth: multiple layers of security checks [251008_EP_7]
 - Tool-level and file/command-level security serve different purposes [251008_EP_7]
 - Transparency in security decisions builds user trust [251008_EP_7]
+
+### Configuration Philosophy
+- Minimize configuration verbosity [251013_EP_1]
+- Centralize configuration for easier management [251013_EP_1]
+- Optional parameters reduce required setup [251013_EP_1]
