@@ -14,6 +14,13 @@
 
 # Stop Hook - Runs when Claude Code finishes responding
 stop:
+  multi_agent_observability:
+    enabled: true
+    module: "multi_agent_observability.main"
+    function: "send_event"
+    config:
+      server_port: 4000
+      add_chat: true
   log_hook:
     enabled: true
     module: "log_hook.main"
@@ -35,6 +42,18 @@ stop:
 
 # Notification Hook - Runs when Claude sends notifications
 notification:
+  multi_agent_observability:
+    enabled: true
+    module: "multi_agent_observability.main"
+    function: "send_event"
+    config:
+      server_port: 4000
+      add_chat: false
+      summarize: true
+      message_pattern: "event_summary.j2"
+      llm:
+        provider: "anthropic"
+        model: "claude-3-5-haiku-latest"
   log_hook:
     enabled: true
     module: "log_hook.main"
@@ -56,6 +75,12 @@ notification:
 
 # SubagentStop Hook - Runs when subagent tasks complete
 subagent_stop:
+  multi_agent_observability:
+    enabled: true
+    module: "multi_agent_observability.main"
+    function: "send_event"
+    config:
+      server_port: 4000
   log_hook:
     enabled: true
     module: "log_hook.main"
@@ -65,6 +90,18 @@ subagent_stop:
 
 # UserPromptSubmit Hook - Runs when user submits a prompt
 user_prompt_submit:
+  multi_agent_observability:
+    enabled: true
+    module: "multi_agent_observability.main"
+    function: "send_event"
+    config:
+      server_port: 4000
+      add_chat: false
+      summarize: true
+      message_pattern: "event_summary.j2"
+      llm:
+        provider: "anthropic"
+        model: "claude-3-5-haiku-latest"
   log_hook:
     enabled: true
     module: "log_hook.main"
@@ -74,6 +111,18 @@ user_prompt_submit:
 
 # PreToolUse Hook - Runs before tool calls
 pre_tool_use:
+  multi_agent_observability:
+    enabled: true
+    module: "multi_agent_observability.main"
+    function: "send_event"
+    config:
+      server_port: 4000
+      add_chat: false
+      summarize: true
+      message_pattern: "event_summary.j2"
+      llm:
+        provider: "anthropic"
+        model: "claude-3-5-haiku-latest"
   worktree_permissions:
     enabled: true
     module: "worktree_permissions.main"
@@ -96,6 +145,18 @@ pre_tool_use:
 
 # PostToolUse Hook - Runs after tool calls complete
 post_tool_use:
+  multi_agent_observability:
+    enabled: true
+    module: "multi_agent_observability.main"
+    function: "send_event"
+    config:
+      server_port: 4000
+      add_chat: false
+      summarize: true
+      message_pattern: "event_summary.j2"
+      llm:
+        provider: "anthropic"
+        model: "claude-3-5-haiku-latest"
   log_hook:
     enabled: true
     module: "log_hook.main"
@@ -105,6 +166,12 @@ post_tool_use:
 
 # PreCompact Hook - Runs before context compaction
 pre_compact:
+  multi_agent_observability:
+    enabled: true
+    module: "multi_agent_observability.main"
+    function: "send_event"
+    config:
+      server_port: 4000
   log_hook:
     enabled: true
     module: "log_hook.main"
@@ -114,6 +181,12 @@ pre_compact:
 
 # SessionStart Hook - Runs when session starts/resumes
 session_start:
+  multi_agent_observability:
+    enabled: true
+    module: "multi_agent_observability.main"
+    function: "send_event"
+    config:
+      server_port: 4000
   security_guard_validator:
     enabled: true
     module: "security_guard.main"
@@ -139,6 +212,12 @@ session_start:
 
 # SessionEnd Hook - Runs when session ends
 session_end:
+  multi_agent_observability:
+    enabled: true
+    module: "multi_agent_observability.main"
+    function: "send_event"
+    config:
+      server_port: 4000
   log_hook:
     enabled: true
     module: "log_hook.main"

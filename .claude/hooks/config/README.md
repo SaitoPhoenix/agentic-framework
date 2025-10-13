@@ -230,7 +230,115 @@ validate_only: (boolean, optional)
   # Default: false
 ```
 
-**Security Rules Structure:**
+---
+
+### 6. multi_agent_observability
+
+**Purpose:** Sends Claude Code hook events to an observability server for multi-agent monitoring
+
+**Module:** `multi_agent_observability.main`
+**Function:** `send_event`
+
+**Use Cases:**
+- Monitoring multiple Claude Code agents across different projects
+- Tracking agent activity and tool usage
+- Building dashboards for agent observability
+- Debugging distributed agent systems
+
+**Output:** Sends HTTP POST to observability server with event data
+
+**Error Handling:** Fails silently (never blocks operations) unless `verbose_errors` is true
+
+**Config:**
+
+```yaml
+source_app: (string, optional)
+  # Source application name sent with events
+  # Default: "claude-code"
+  # Use to identify different agents/projects in observability dashboard
+
+server_host: (string, optional)
+  # IP address or hostname for the observability server
+  # Default: "localhost"
+
+server_port: (integer, optional)
+  # Port number for the observability server
+  # Default: 4000
+
+add_chat: (boolean, optional)
+  # Whether to include chat transcript with event
+  # Default: false
+  # Set to true for 'stop' hook to capture full conversation
+
+summarize: (boolean, optional)
+  # Whether to generate an LLM summary of the event
+  # Default: false
+  # Set to true for: pre_tool_use, post_tool_use, notification, user_prompt_submit
+
+message_pattern: (string, required if summarize is true)
+  # Jinja2 template file for summary prompt
+  # Located in .claude/hooks/utils/patterns/
+  # Example: "event_summary.j2"
+
+llm: (object, required if summarize is true)
+  provider: (string)
+    # LLM provider: openai, anthropic, ollama, tabby
+
+  model: (string)
+    # Model identifier
+    # Example: "claude-3-5-haiku-latest"
+
+  base_url: (string, optional)
+    # Custom API endpoint for local providers
+```
+
+**Event Data Structure:**
+
+Events are sent as HTTP POST to `http://{server_host}:{server_port}/events` with this JSON payload:
+
+```json
+{
+  "source_app": "claude-code",
+  "session_id": "abc123",
+  "hook_event_type": "PreToolUse",
+  "payload": { /* full hook input data */ },
+  "timestamp": 1234567890000,
+  "summary": "Optional LLM-generated summary",
+  "chat": [ /* Optional chat transcript array */ ]
+}
+```
+
+---
+
+### 7. worktree_permissions
+
+**Purpose:** Manages tool permissions based on git worktree context for workspace isolation
+
+**Module:** `worktree_permissions.main`
+**Function:** `check_permissions`
+
+**Use Cases:**
+- Isolating development work in git worktrees
+- Preventing cross-worktree contamination
+- Enforcing workspace boundaries
+- Two-layer security with security_guard
+
+**Output:** Returns permission decision (allow/ask/deny) via `hookSpecificOutput`
+
+**Error Handling:** Fails safely (allows on error) unless `verbose_errors` is true
+
+**Config:**
+
+```yaml
+config_file: (string, required)
+  # Path to worktree-permissions.yaml (relative to project root)
+  # Default: ".claude/hooks/config/worktree-permissions.yaml"
+  # Contains worktree-specific permission rules
+```
+
+---
+
+**Security Rules Structure (security_guard):**
 
 The `security-rules.yaml` file defines rules in a whitelist/blacklist hierarchy:
 
