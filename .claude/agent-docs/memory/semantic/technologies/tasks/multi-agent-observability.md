@@ -4,7 +4,7 @@ aliases:
   - multi_agent_observability
   - observability event sender
 entity_classification: technology/task
-status: new
+status: active
 created: 2025-10-13T17:50:00Z
 last_updated: 2025-10-13T17:50:00Z
 source_episodes:

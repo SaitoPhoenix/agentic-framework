@@ -64,7 +64,7 @@ This section defines critical context needed for tasks in semantic memory review
 
   - **MEMORY_PATTERN**: The semantic memory pattern at $MEMORY_PATTERN_PATH/semantic-memory_pattern.md
   - **RELATIONSHIP_TYPOLOGY**: The relationship typology definitions at $MEMORY_PATH/relationship-typology.yaml
-  - **EPISODIC_MEMORY**: The episodic memory file at $EPISODIC_MEMORY_PATH/**/$EPISODE_ID.json
+  - **EPISODIC_MEMORY**: Search for $EPISODE_ID.json in $EPISODIC_BASE_PATH to find the JSON transcript file
   - **SEMANTIC_MEMORY**: The semantic memory file at $SEMANTIC_MEMORY_PATH
   - **REPORT_PATTERN**: The report pattern at $REPORT_PATTERN_PATH/memory-review-report_pattern.md
   - **REVIEW_REPORT**: The review report at $REVIEW_REPORT_PATH/memory-review-report_$EPISODE_ID.md

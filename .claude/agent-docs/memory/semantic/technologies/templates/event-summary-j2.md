@@ -3,7 +3,7 @@ name: event-summary-j2
 aliases:
   - event_summary.j2
 entity_classification: technology/template
-status: new
+status: active
 created: 2025-10-13T17:50:00Z
 last_updated: 2025-10-13T17:50:00Z
 source_episodes:

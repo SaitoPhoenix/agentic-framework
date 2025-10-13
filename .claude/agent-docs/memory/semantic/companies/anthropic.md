@@ -3,7 +3,7 @@ name: anthropic
 aliases:
   - Anthropic
 entity_classification: company
-status: new
+status: active
 created: 2025-10-13T17:50:00Z
 last_updated: 2025-10-13T17:50:00Z
 source_episodes:
