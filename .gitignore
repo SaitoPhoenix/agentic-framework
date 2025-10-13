@@ -183,5 +183,8 @@ temp/
 .claude/hooks/test/reports/
 #CLAUDE.md
 
+# Development
+trees/
+
 # Slack data
 slack-bots.md
