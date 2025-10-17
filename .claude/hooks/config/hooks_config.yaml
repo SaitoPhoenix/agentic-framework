@@ -15,7 +15,7 @@
 # Stop Hook - Runs when Claude Code finishes responding
 stop:
   multi_agent_observability:
-    enabled: true
+    enabled: false
     module: "multi_agent_observability.main"
     function: "send_event"
     config:
@@ -43,7 +43,7 @@ stop:
 # Notification Hook - Runs when Claude sends notifications
 notification:
   multi_agent_observability:
-    enabled: true
+    enabled: false
     module: "multi_agent_observability.main"
     function: "send_event"
     config:
@@ -76,7 +76,7 @@ notification:
 # SubagentStop Hook - Runs when subagent tasks complete
 subagent_stop:
   multi_agent_observability:
-    enabled: true
+    enabled: false
     module: "multi_agent_observability.main"
     function: "send_event"
     config:
@@ -91,7 +91,7 @@ subagent_stop:
 # UserPromptSubmit Hook - Runs when user submits a prompt
 user_prompt_submit:
   multi_agent_observability:
-    enabled: true
+    enabled: false
     module: "multi_agent_observability.main"
     function: "send_event"
     config:
@@ -112,7 +112,7 @@ user_prompt_submit:
 # PreToolUse Hook - Runs before tool calls
 pre_tool_use:
   multi_agent_observability:
-    enabled: true
+    enabled: false
     module: "multi_agent_observability.main"
     function: "send_event"
     config:
@@ -146,7 +146,7 @@ pre_tool_use:
 # PostToolUse Hook - Runs after tool calls complete
 post_tool_use:
   multi_agent_observability:
-    enabled: true
+    enabled: false
     module: "multi_agent_observability.main"
     function: "send_event"
     config:
@@ -167,7 +167,7 @@ post_tool_use:
 # PreCompact Hook - Runs before context compaction
 pre_compact:
   multi_agent_observability:
-    enabled: true
+    enabled: false
     module: "multi_agent_observability.main"
     function: "send_event"
     config:
@@ -182,7 +182,7 @@ pre_compact:
 # SessionStart Hook - Runs when session starts/resumes
 session_start:
   multi_agent_observability:
-    enabled: true
+    enabled: false
     module: "multi_agent_observability.main"
     function: "send_event"
     config:
@@ -213,7 +213,7 @@ session_start:
 # SessionEnd Hook - Runs when session ends
 session_end:
   multi_agent_observability:
-    enabled: true
+    enabled: false
     module: "multi_agent_observability.main"
     function: "send_event"
     config:
