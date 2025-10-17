@@ -33,7 +33,7 @@ from watchdog.events import FileSystemEventHandler
 # ==============================================================================
 # Define raw object types to ignore BEFORE Pydantic validation.
 # These objects have a different structure and would cause a validation error.
-IGNORED_OBJECT_TYPES = {"summary"}
+IGNORED_OBJECT_TYPES = {"summary", "file-history-snapshot"}
 
 # Define message types to ignore AFTER Pydantic validation.
 # These objects are structurally valid but are not part of the main conversation.
@@ -48,6 +48,7 @@ class OperationType(Enum):
     """Types of operations in conversations"""
 
     RESPONSE = "response"
+    THINKING = "thinking"
     TOOL_TASK = "Tool:Task"
     TOOL_READ = "Tool:Read"
     TOOL_WRITE = "Tool:Write"
@@ -83,10 +84,16 @@ class ToolResultContent(BaseModel):
     is_error: bool = False
 
 
+class ThinkingContent(BaseModel):
+    type: Literal["thinking"]
+    thinking: str
+    signature: Optional[str] = None
+
+
 # A discriminated union will automatically parse into the correct model
 # based on the 'type' field.
 ContentItem = Annotated[
-    Union[TextContent, ToolUseContent, ToolResultContent],
+    Union[TextContent, ToolUseContent, ToolResultContent, ThinkingContent],
     Field(discriminator="type"),
 ]
 
@@ -681,6 +688,8 @@ class TranscriptCapturer:
         for item in raw_obj.message.content:
             if isinstance(item, TextContent):
                 return OperationType.RESPONSE, item.text
+            if isinstance(item, ThinkingContent):
+                return OperationType.THINKING, item.thinking
             if isinstance(item, ToolUseContent):
                 return self.tool_processor.process_tool_use(
                     item.name, item.input, item.id
@@ -733,18 +742,20 @@ class TranscriptCapturer:
         file.write('    "metadata":[\n')
         for i, item in enumerate(data["metadata"]):
             comma = "," if i < len(data["metadata"]) - 1 else ""
-            file.write(f'        {json.dumps(item)}{comma}\n')
-        file.write('    ],\n')
+            file.write(f"        {json.dumps(item)}{comma}\n")
+        file.write("    ],\n")
 
         # Write conversations_headers
-        file.write(f'    "conversations_headers":{json.dumps(data["conversations_headers"])},\n')
+        file.write(
+            f'    "conversations_headers":{json.dumps(data["conversations_headers"])},\n'
+        )
 
         # Write conversations_data
         file.write('    "conversations_data":[\n')
         for i, item in enumerate(data["conversations_data"]):
             comma = "," if i < len(data["conversations_data"]) - 1 else ""
-            file.write(f'        {json.dumps(item)}{comma}\n')
-        file.write('    ]\n')
+            file.write(f"        {json.dumps(item)}{comma}\n")
+        file.write("    ]\n")
 
         file.write("}\n")
 
